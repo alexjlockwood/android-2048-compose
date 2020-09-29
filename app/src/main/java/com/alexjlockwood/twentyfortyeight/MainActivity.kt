@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
             TwentyFortyEightTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     GameGrid(
-                        grid = gameViewModel.grid,
+                        tileMoveInfos = gameViewModel.tileMoveInfos,
                         onSwipeListener = { direction -> gameViewModel.move(direction) },
                     )
                 }

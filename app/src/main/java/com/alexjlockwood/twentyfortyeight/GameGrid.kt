@@ -29,9 +29,10 @@ import kotlin.math.min
 
 @Composable
 fun GameGrid(
-    grid: List<List<Int?>>,
+    tileMoveInfos: List<TileMoveInfo>,
     onSwipeListener: (direction: Direction) -> Unit,
 ) {
+    println("COMPOSING ${tileMoveInfos.size}")
     val minTouchSlop = with(DensityAmbient.current) { TouchSlop.toPx() }
     val minSwipeVelocity = with(DensityAmbient.current) { MinFlingVelocity.toPx() }
     val tileMargin = with(DensityAmbient.current) { 4.dp.toPx() }
@@ -64,36 +65,56 @@ fun GameGrid(
                 size = it
             },
         ) {
-            for (row in grid.indices) {
-                val tiles = grid[row]
-                for (col in tiles.indices) {
-                    val tileSize = (min(size.width, size.height) - tileMargin * (GRID_SIZE - 1)) / GRID_SIZE
-                    val translationX = col * (tileSize + tileMargin)
-                    val translationY = row * (tileSize + tileMargin)
+            val tileSize = (min(size.width, size.height) - tileMargin * (GRID_SIZE - 1)) / GRID_SIZE
 
-                    // TODO: handle all tile numbers
-                    val tile = tiles[col] ?: continue
-                    val color = when (tile) {
-                        2 -> Color.Red
-                        4 -> Color.Blue
-                        8 -> Color.Green
-                        16 -> Color.Yellow
-                        32 -> Color.Cyan
-                        64 -> Color.Magenta
-                        else -> Color.Black
-                    }
+            val deletedTileMoveInfos = tileMoveInfos.filterIsInstance<TileDeleted>()
+            val deletedTiles = deletedTileMoveInfos.map { it.tile }
+            val shiftedTileMoveInfos = tileMoveInfos.filterIsInstance<TileShifted>()
+            val shiftedTiles = shiftedTileMoveInfos.map { it.to }.filter { !deletedTiles.contains(it) }
+            val addedTiles = tileMoveInfos.filterIsInstance<TileAdded>().map { it.tile }
 
-                    TileText(
-                        text = "$tile",
-                        modifier = Modifier.drawLayer(
-                            translationX = translationX,
-                            translationY = translationY,
-                        ),
-                        color = color,
-                    )
-                }
+            for (shiftedTile in shiftedTiles) {
+                val (row, col, num) = shiftedTile
+                val translationX = col * (tileSize + tileMargin)
+                val translationY = row * (tileSize + tileMargin)
+
+                TileText(
+                    text = "$num",
+                    modifier = Modifier.drawLayer(
+                        translationX = translationX,
+                        translationY = translationY,
+                    ),
+                    color = getColorForTile(shiftedTile),
+                )
+            }
+
+            for (addedTile in addedTiles) {
+                val (row, col, num) = addedTile
+                val translationX = col * (tileSize + tileMargin)
+                val translationY = row * (tileSize + tileMargin)
+
+                TileText(
+                    text = "$num",
+                    modifier = Modifier.drawLayer(
+                        translationX = translationX,
+                        translationY = translationY,
+                    ),
+                    color = getColorForTile(addedTile),
+                )
             }
         }
+    }
+}
+
+private fun getColorForTile(tile: Tile): Color {
+    return when (tile.num) {
+        2 -> Color.Red
+        4 -> Color.Blue
+        8 -> Color.Green
+        16 -> Color.Yellow
+        32 -> Color.Cyan
+        64 -> Color.Magenta
+        else -> Color.Black
     }
 }
 
