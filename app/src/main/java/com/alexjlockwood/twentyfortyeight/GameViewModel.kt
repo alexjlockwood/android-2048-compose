@@ -10,31 +10,39 @@ const val GRID_SIZE = 4
 
 class GameViewModel : ViewModel() {
 
-    private var grid by mutableStateOf((0 until GRID_SIZE).map { arrayOfNulls<Int?>(GRID_SIZE).toList() })
+    private var grid = (0 until GRID_SIZE).map { arrayOfNulls<Int?>(GRID_SIZE).toList() }
 
     var tileMoveInfos by mutableStateOf<List<TileMoveInfo>>(mutableListOf())
         private set
 
+    var moveCount by mutableStateOf(0)
+        private set
+
     init {
         val tileMoveInfos = mutableListOf<TileMoveInfo>()
-        val addedTile1 = getRandomEmptyGridTile()
-        if (addedTile1 != null) {
-            tileMoveInfos.add(TileAdded(addedTile1))
-            addTileToGrid(addedTile1)
-        }
-        val addedTile2 = getRandomEmptyGridTile()
-        if (addedTile2 != null) {
-            tileMoveInfos.add(TileAdded(addedTile2))
-            addTileToGrid(addedTile2)
-        }
+//        for (i in 0..1) {
+//            val addedTile = getRandomEmptyGridTile()
+//            if (addedTile != null) {
+//                tileMoveInfos.add(TileAdded(addedTile))
+//                addTileToGrid(addedTile)
+//            }
+//        }
+        tileMoveInfos.add(TileAdded(Tile(0, 0, 2)))
+        addTileToGrid(Tile(0, 0, 2))
+        tileMoveInfos.add(TileAdded(Tile(0, 1, 2)))
+        addTileToGrid(Tile(0, 1, 2))
+        tileMoveInfos.add(TileAdded(Tile(0, 3, 2)))
+        addTileToGrid(Tile(0, 3, 2))
         this.tileMoveInfos = tileMoveInfos
     }
 
     fun move(direction: Direction) {
-        println("===== BEFORE")
-        grid.forEach {
-            println("===== $it")
-        }
+        moveCount++
+
+//        println("===== BEFORE")
+//        grid.forEach {
+//            println("===== $it")
+//        }
 
         val numRotations = when (direction) {
             Direction.WEST -> 0
@@ -42,16 +50,12 @@ class GameViewModel : ViewModel() {
             Direction.EAST -> 2
             Direction.NORTH -> 3
         }
-        grid = rotateGrid(grid, numRotations)
+        grid = grid.rotate(numRotations)
 
         val tileMoveInfos = mutableListOf<TileMoveInfo>()
-        //val inverseNumRotations = floorMod(-numRotations, GRID_SIZE)
 
         grid = grid.mapIndexed { currentRowIndex, _ ->
             val tiles = grid[currentRowIndex].toMutableList()
-            if (tiles.size != grid[currentRowIndex].size) {
-                throw RuntimeException()
-            }
             var lastSeenTileIndex: Int? = null
             var lastSeenEmptyIndex: Int? = null
             for (currentColIndex in tiles.indices) {
@@ -99,12 +103,16 @@ class GameViewModel : ViewModel() {
                                     currentTileNum)))
 
                             // Merge the current tile with the previous tile.
-                            tileMoveInfos.add(TileAdded(Tile(getRotatedRowAt(currentRowIndex, lastSeenTileIndex, numRotations),
+                            tileMoveInfos.add(TileAdded(Tile(getRotatedRowAt(currentRowIndex,
+                                lastSeenTileIndex,
+                                numRotations),
                                 getRotatedColAt(currentRowIndex, lastSeenTileIndex, numRotations),
                                 currentTileNum * 2)))
 
                             // Delete the tiles underneath the merged tile.
-                            tileMoveInfos.add(TileDeleted(Tile(getRotatedRowAt(currentRowIndex, lastSeenTileIndex, numRotations),
+                            tileMoveInfos.add(TileDeleted(Tile(getRotatedRowAt(currentRowIndex,
+                                lastSeenTileIndex,
+                                numRotations),
                                 getRotatedColAt(currentRowIndex, lastSeenTileIndex, numRotations),
                                 currentTileNum)))
 
@@ -121,11 +129,12 @@ class GameViewModel : ViewModel() {
                             } else {
                                 // Shift the current tile towards the previous tile.
                                 tileMoveInfos.add(TileShifted(currentTile,
-                                    Tile( getRotatedRowAt(currentRowIndex, lastSeenEmptyIndex, numRotations),
+                                    Tile(getRotatedRowAt(currentRowIndex, lastSeenEmptyIndex, numRotations),
                                         getRotatedColAt(currentRowIndex, lastSeenEmptyIndex, numRotations),
                                         currentTileNum)))
 
                                 tiles[lastSeenEmptyIndex] = currentTileNum
+                                tiles[currentColIndex] = null
                                 lastSeenEmptyIndex++
                             }
                             lastSeenTileIndex++
@@ -136,36 +145,26 @@ class GameViewModel : ViewModel() {
             tiles
         }
 
-        grid = rotateGrid(grid, floorMod(-numRotations, GRID_SIZE))
+        grid = grid.rotate(floorMod(-numRotations, GRID_SIZE))
 
-        val addedTile = getRandomEmptyGridTile()
-        if (addedTile != null) {
-            tileMoveInfos.add(TileAdded(addedTile))
-            addTileToGrid(addedTile)
-        }
+//        val addedTile = getRandomEmptyGridTile()
+//        if (addedTile != null) {
+//            tileMoveInfos.add(TileAdded(addedTile))
+//            addTileToGrid(addedTile)
+//        }
 
         this.tileMoveInfos = tileMoveInfos
-        println(this.tileMoveInfos.size)
+//        println(this.tileMoveInfos.size)
 
-        println("===== AFTER")
-        grid.forEach {
-            println("===== $it")
-        }
+//        println("===== AFTER")
+//        grid.forEach {
+//            println("===== $it")
+//        }
     }
 
-    private fun addTileToGrid(tile: Tile) {
-        val (row, col, num) = tile
-        grid = grid.mapIndexed { r, tiles ->
-            if (row != r) {
-                return@mapIndexed tiles
-            }
-            tiles.mapIndexed { c, tile ->
-                if (col != c) {
-                    return@mapIndexed tile
-                }
-                num
-            }
-        }
+    private fun addTileToGrid(addedTile: Tile) {
+        val (addedRow, addedCol, addedNum) = addedTile
+        grid = grid.map { row, col, it -> if (row == addedRow && col == addedCol) addedNum else it }
     }
 
     private fun getRandomEmptyGridTile(): Tile? {
@@ -187,13 +186,11 @@ class GameViewModel : ViewModel() {
     }
 }
 
-private fun <T> rotateGrid(grid: List<List<T>>, @IntRange(from = 0, to = 3) numRotations: Int): List<List<T>> {
-    return grid.mapIndexed { row, rowTiles ->
-        rowTiles.mapIndexed { col, _ ->
-            val rotatedRow = getRotatedRowAt(row, col, numRotations)
-            val rotatedCol = getRotatedColAt(row, col, numRotations)
-            grid[rotatedRow][rotatedCol]
-        }
+private fun <T> List<List<T>>.rotate(@IntRange(from = 0, to = 3) numRotations: Int): List<List<T>> {
+    return map { row, col, _ ->
+        val rotatedRow = getRotatedRowAt(row, col, numRotations)
+        val rotatedCol = getRotatedColAt(row, col, numRotations)
+        this[rotatedRow][rotatedCol]
     }
 }
 
@@ -215,6 +212,10 @@ private fun getRotatedColAt(row: Int, col: Int, @IntRange(from = 0, to = 3) numR
         3 -> GRID_SIZE - 1 - row
         else -> throw IllegalArgumentException("numRotations must be an integer in [0,3]")
     }
+}
+
+private fun <T> List<List<T>>.map(transform: (row: Int, col: Int, T) -> T): List<List<T>> {
+    return mapIndexed { row, rowTiles -> rowTiles.mapIndexed { col, it -> transform(row, col, it) } }
 }
 
 sealed class TileMoveInfo

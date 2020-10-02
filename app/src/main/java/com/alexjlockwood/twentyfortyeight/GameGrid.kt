@@ -1,19 +1,14 @@
 package com.alexjlockwood.twentyfortyeight
 
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
+import androidx.compose.animation.VectorConverter
+import androidx.compose.animation.animatedValue
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
-import androidx.compose.ui.Layout
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Size
@@ -30,9 +25,9 @@ import kotlin.math.min
 @Composable
 fun GameGrid(
     tileMoveInfos: List<TileMoveInfo>,
+    moveCount: Int,
     onSwipeListener: (direction: Direction) -> Unit,
 ) {
-    println("COMPOSING ${tileMoveInfos.size}")
     val minTouchSlop = with(DensityAmbient.current) { TouchSlop.toPx() }
     val minSwipeVelocity = with(DensityAmbient.current) { MinFlingVelocity.toPx() }
     val tileMargin = with(DensityAmbient.current) { 4.dp.toPx() }
@@ -41,7 +36,7 @@ fun GameGrid(
         modifier = Modifier.fillMaxSize().dragGestureFilter(
             dragObserver = SwipeDragObserver(minTouchSlop, minSwipeVelocity, onSwipeListener),
         ),
-        gravity = ContentGravity.Center,
+        alignment = Alignment.Center,
     ) {
         var size by remember { mutableStateOf(IntSize.Zero) }
         GridLayout(
@@ -59,32 +54,35 @@ fun GameGrid(
                         )
                     }
                 }
-            },
-            onSizeChanged = {
-                // TODO: update this to use `Modifier.onSizeChanged` once it is merged
-                size = it
-            },
+            }.onSizeChanged { size = it },
         ) {
             val tileSize = (min(size.width, size.height) - tileMargin * (GRID_SIZE - 1)) / GRID_SIZE
 
             val deletedTileMoveInfos = tileMoveInfos.filterIsInstance<TileDeleted>()
             val deletedTiles = deletedTileMoveInfos.map { it.tile }
-            val shiftedTileMoveInfos = tileMoveInfos.filterIsInstance<TileShifted>()
-            val shiftedTiles = shiftedTileMoveInfos.map { it.to }.filter { !deletedTiles.contains(it) }
+            val shiftedTileMoveInfos =
+                tileMoveInfos.filterIsInstance<TileShifted>().filter { !deletedTiles.contains(it.to) }
             val addedTiles = tileMoveInfos.filterIsInstance<TileAdded>().map { it.tile }
 
-            for (shiftedTile in shiftedTiles) {
-                val (row, col, num) = shiftedTile
-                val translationX = col * (tileSize + tileMargin)
-                val translationY = row * (tileSize + tileMargin)
+            for (shiftedTileMoveInfo in shiftedTileMoveInfos) {
+                val (fromTile, toTile) = shiftedTileMoveInfo
+                val (fromRow, fromCol) = fromTile
+                val (toRow, toCol, toNum) = toTile
 
-                TileText(
-                    text = "$num",
-                    modifier = Modifier.drawLayer(
-                        translationX = translationX,
-                        translationY = translationY,
-                    ),
-                    color = getColorForTile(shiftedTile),
+                val fromTranslationX = fromCol * (tileSize + tileMargin)
+                val toTranslationX = toCol * (tileSize + tileMargin)
+                val fromTranslationY = fromRow * (tileSize + tileMargin)
+                val toTranslationY = toRow * (tileSize + tileMargin)
+                val fromOffset = Offset(fromTranslationX, fromTranslationY)
+                val toOffset = Offset(toTranslationX, toTranslationY)
+
+                println("===== ($fromRow, $fromCol) -> ($toRow, $toCol)")
+                ShiftedTileText(
+                    text = "$toNum",
+                    color = getColorForTile(toTile),
+                    fromOffset = fromOffset,
+                    toOffset = toOffset,
+                    moveCount = moveCount,
                 )
             }
 
@@ -93,13 +91,14 @@ fun GameGrid(
                 val translationX = col * (tileSize + tileMargin)
                 val translationY = row * (tileSize + tileMargin)
 
-                TileText(
+                AddedTileText(
                     text = "$num",
                     modifier = Modifier.drawLayer(
                         translationX = translationX,
                         translationY = translationY,
                     ),
                     color = getColorForTile(addedTile),
+                    moveCount = moveCount,
                 )
             }
         }
@@ -121,16 +120,12 @@ private fun getColorForTile(tile: Tile): Color {
 @Composable
 private fun GridLayout(
     modifier: Modifier = Modifier,
-    onSizeChanged: (IntSize) -> Unit,
     children: @Composable () -> Unit,
 ) {
     val tileMargin = with(DensityAmbient.current) { 4.dp.toPx().toInt() }
     Layout(children = children, modifier = modifier) { measurables, constraints ->
         val maxWidth = constraints.maxWidth
         val maxHeight = constraints.maxHeight
-
-        // TODO: only call this when the size has changed
-        onSizeChanged(IntSize(maxWidth, maxHeight))
 
         val childSize = (min(maxWidth, maxHeight) - (GRID_SIZE - 1) * tileMargin) / GRID_SIZE
         val placeables = measurables.map { measurable ->
@@ -146,16 +141,48 @@ private fun GridLayout(
 }
 
 @Composable
-private fun TileText(
+private fun AddedTileText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color,
+    moveCount: Int,
 ) {
+//    val alpha = animatedFloat(initVal = 0f)
     Text(
         text = text,
         modifier = modifier.background(
-            color = color,
+            color = color,//.copy(alpha = alpha.value),
             shape = RoundedCornerShape(4.dp),
         ).wrapContentSize(),
     )
+//    onCommit(moveCount) {
+//        alpha.animateTo(1f, TweenSpec(durationMillis = 400))
+//    }
+}
+
+@Composable
+private fun ShiftedTileText(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color,
+    fromOffset: Offset,
+    toOffset: Offset,
+    moveCount: Int,
+) {
+    val animatedOffset = animatedValue(fromOffset, Offset.VectorConverter)
+    Text(
+        text = text,
+        modifier = modifier
+            .drawLayer(
+                translationX = animatedOffset.value.x,
+                translationY = animatedOffset.value.y,
+            ).background(
+                color = color,
+                shape = RoundedCornerShape(4.dp),
+            ).wrapContentSize(),
+    )
+    onCommit(moveCount) {
+        println("===== onCommit ${animatedOffset.value.x} ${animatedOffset.value.y}")
+        animatedOffset.animateTo(toOffset, TweenSpec(durationMillis = 4000))
+    }
 }

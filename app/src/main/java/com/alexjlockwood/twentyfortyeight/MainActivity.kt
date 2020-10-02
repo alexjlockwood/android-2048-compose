@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
                 Surface(color = MaterialTheme.colors.background) {
                     GameGrid(
                         tileMoveInfos = gameViewModel.tileMoveInfos,
+                        moveCount = gameViewModel.moveCount,
                         onSwipeListener = { direction -> gameViewModel.move(direction) },
                     )
                 }
