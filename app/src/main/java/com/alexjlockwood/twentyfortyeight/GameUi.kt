@@ -28,7 +28,7 @@ import kotlin.math.min
 private val GRID_TILE_RADIUS = 4.dp
 
 @Composable
-fun GameGrid(
+fun GameUi(
     gridTileMovements: List<GridTileMovement>,
     moveCount: Int,
     onSwipeListener: (direction: Direction) -> Unit,
@@ -36,51 +36,59 @@ fun GameGrid(
     val dragObserver = with(DensityAmbient.current) {
         SwipeDragObserver(TouchSlop.toPx(), MinFlingVelocity.toPx(), onSwipeListener)
     }
-    val tileMarginPx = with(DensityAmbient.current) { 4.dp.toPx() }
-
     Box(
         modifier = Modifier.fillMaxSize().dragGestureFilter(dragObserver),
         alignment = Alignment.Center,
     ) {
-        var size by remember { mutableStateOf(IntSize.Zero) }
-        val tileSizePx = ((min(size.width, size.height) - tileMarginPx * (GRID_SIZE - 1)) / GRID_SIZE).coerceAtLeast(0f)
-        val tileSizeDp = Dp(tileSizePx / DensityAmbient.current.density)
-        val tileOffsetPx = tileSizePx + tileMarginPx
-        val emptyTileColor = getEmptyTileColor(isSystemInDarkTheme())
+        GameGrid(
+            modifier = Modifier.aspectRatio(1f).fillMaxSize().padding(16.dp),
+            gridTileMovements = gridTileMovements,
+            moveCount = moveCount,
+        )
+    }
+}
 
-        Box(
-            modifier = Modifier.aspectRatio(1f).fillMaxSize().padding(16.dp).drawBehind {
-                for (row in 0 until GRID_SIZE) {
-                    for (col in 0 until GRID_SIZE) {
-                        drawRoundRect(
-                            color = emptyTileColor,
-                            topLeft = Offset(col * tileOffsetPx, row * tileOffsetPx),
-                            size = Size(tileSizePx, tileSizePx),
-                            radius = Radius(GRID_TILE_RADIUS.toPx()),
-                        )
-                    }
-                }
-            }.onSizeChanged { size = it },
-        ) {
-            for (gridTileMovement in gridTileMovements) {
-                val (fromGridTile, toGridTile) = gridTileMovement
-                val fromScale = if (fromGridTile == null) 0f else 1f
-                val toOffset = Offset(toGridTile.cell.col * tileOffsetPx, toGridTile.cell.row * tileOffsetPx)
-                val fromOffset = if (fromGridTile == null) {
-                    toOffset
-                } else {
-                    Offset(fromGridTile.cell.col * tileOffsetPx, fromGridTile.cell.row * tileOffsetPx)
-                }
-                key(toGridTile.tile.id) {
-                    GridTileText(
-                        num = toGridTile.tile.num,
-                        size = tileSizeDp,
-                        fromScale = fromScale,
-                        fromOffset = fromOffset,
-                        toOffset = toOffset,
-                        moveCount = moveCount,
+@Composable
+private fun GameGrid(
+    modifier: Modifier = Modifier,
+    gridTileMovements: List<GridTileMovement>,
+    moveCount: Int,
+) {
+    var size by remember { mutableStateOf(IntSize.Zero) }
+    val tileMarginPx = with(DensityAmbient.current) { 4.dp.toPx() }
+    val tileSizePx = ((min(size.width, size.height) - tileMarginPx * (GRID_SIZE - 1)) / GRID_SIZE).coerceAtLeast(0f)
+    val tileSizeDp = Dp(tileSizePx / DensityAmbient.current.density)
+    val tileOffsetPx = tileSizePx + tileMarginPx
+    val emptyTileColor = getEmptyTileColor(isSystemInDarkTheme())
+
+    Box(
+        modifier = modifier.drawBehind {
+            for (row in 0 until GRID_SIZE) {
+                for (col in 0 until GRID_SIZE) {
+                    drawRoundRect(
+                        color = emptyTileColor,
+                        topLeft = Offset(col * tileOffsetPx, row * tileOffsetPx),
+                        size = Size(tileSizePx, tileSizePx),
+                        radius = Radius(GRID_TILE_RADIUS.toPx()),
                     )
                 }
+            }
+        }.onSizeChanged { size = it },
+    ) {
+        for (gridTileMovement in gridTileMovements) {
+            val (fromGridTile, toGridTile) = gridTileMovement
+            val fromScale = if (fromGridTile == null) 0f else 1f
+            val toOffset = Offset(toGridTile.cell.col * tileOffsetPx, toGridTile.cell.row * tileOffsetPx)
+            val fromOffset = fromGridTile?.let { Offset(it.cell.col * tileOffsetPx, it.cell.row * tileOffsetPx) } ?: toOffset
+            key(toGridTile.tile.id) {
+                GridTileText(
+                    num = toGridTile.tile.num,
+                    size = tileSizeDp,
+                    fromScale = fromScale,
+                    fromOffset = fromOffset,
+                    toOffset = toOffset,
+                    moveCount = moveCount,
+                )
             }
         }
     }

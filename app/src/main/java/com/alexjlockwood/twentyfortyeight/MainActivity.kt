@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    GameGrid(
+                    GameUi(
                         gridTileMovements = gameViewModel.gridTileMovements,
                         moveCount = gameViewModel.moveCount,
                         onSwipeListener = { direction -> gameViewModel.move(direction) },

@@ -14,15 +14,11 @@ class GameViewModel : ViewModel() {
 
     private var grid = (0 until GRID_SIZE).map { arrayOfNulls<Tile?>(GRID_SIZE).toList() }
 
-    var gridTileMovements by mutableStateOf<List<GridTileMovement>>(listOf())
+    var gridTileMovements by mutableStateOf(addRandomTilesToGrid(NUM_INITIAL_TILES))
         private set
 
     var moveCount by mutableStateOf(0)
         private set
-
-    init {
-        this.gridTileMovements = addRandomTilesToGrid(NUM_INITIAL_TILES)
-    }
 
     fun move(direction: Direction) {
         val numRotations = when (direction) {
@@ -111,8 +107,6 @@ class GameViewModel : ViewModel() {
 
         grid = grid.rotate(floorMod(-numRotations, GRID_SIZE))
 
-        gridTileMovements.addAll(addRandomTilesToGrid())
-
         val hasGridChanged = gridTileMovements.any {
             val (fromTile, toTile) = it
             fromTile == null || fromTile.cell != toTile.cell
@@ -121,6 +115,8 @@ class GameViewModel : ViewModel() {
             // No move made.
             return
         }
+
+        gridTileMovements.addAll(addRandomTilesToGrid())
 
         this.gridTileMovements = gridTileMovements.sortedWith { a, _ -> if (a.fromGridTile == null) 1 else -1 }
         this.moveCount++
