@@ -15,10 +15,10 @@ class MainActivity : AppCompatActivity() {
         val gameViewModel by viewModels<GameViewModel>()
 
         setContent {
-            TwentyFortyEightTheme {
+            AppTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     GameGrid(
-                        tileMoveInfos = gameViewModel.tileMoveInfos,
+                        gridTileMovements = gameViewModel.gridTileMovements,
                         moveCount = gameViewModel.moveCount,
                         onSwipeListener = { direction -> gameViewModel.move(direction) },
                     )
