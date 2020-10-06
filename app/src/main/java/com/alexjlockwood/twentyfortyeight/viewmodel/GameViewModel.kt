@@ -79,7 +79,7 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
         this.isGameOver = checkIsGameOver(grid)
 
         this.gameRepository.saveState(
-            this.grid.map { tiles -> tiles.map { it?.num }},
+            this.grid.map { tiles -> tiles.map { it?.num } },
             this.currentScore,
             this.bestScore,
         )
@@ -103,16 +103,10 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
     }
 
     private fun getRandomEmptyGridTile(): GridTile? {
-        val emptyCells = mutableListOf<Cell>()
-        for (r in grid.indices) {
-            val tiles = grid[r]
-            for (c in tiles.indices) {
-                if (tiles[c] == null) {
-                    emptyCells.add(Cell(r, c))
-                }
-            }
+        val emptyCells = grid.flatMapIndexed { row, tiles ->
+            tiles.mapIndexed { col, it -> if (it == null) Cell(row, col) else null }.filterNotNull()
         }
-        val emptyCell = emptyCells.getOrNull((0 until emptyCells.size).random()) ?: return null
+        val emptyCell = emptyCells.getOrNull(emptyCells.indices.random()) ?: return null
         return GridTile(emptyCell, if (Math.random() < 0.9f) Tile(2) else Tile(4))
     }
 }
@@ -208,10 +202,7 @@ private fun makeMove(origGrid: List<List<Tile?>>, direction: Direction): Pair<Li
 }
 
 private fun checkIsGameOver(grid: List<List<Tile?>>): Boolean {
-    return !hasGridChanged(makeMove(grid, Direction.NORTH).second)
-            && !hasGridChanged(makeMove(grid, Direction.SOUTH).second)
-            && !hasGridChanged(makeMove(grid, Direction.EAST).second)
-            && !hasGridChanged(makeMove(grid, Direction.WEST).second)
+    return Direction.values().none { hasGridChanged(makeMove(grid, it).second) }
 }
 
 private fun hasGridChanged(gridTileMovements: List<GridTileMovement>): Boolean {
@@ -228,10 +219,6 @@ private fun <T> List<List<T>>.rotate(@IntRange(from = 0, to = 3) numRotations: I
     }
 }
 
-private fun <T> List<List<T>>.map(transform: (row: Int, col: Int, T) -> T): List<List<T>> {
-    return mapIndexed { row, rowTiles -> rowTiles.mapIndexed { col, it -> transform(row, col, it) } }
-}
-
 private fun getRotatedCellAt(row: Int, col: Int, @IntRange(from = 0, to = 3) numRotations: Int): Cell {
     return when (numRotations) {
         0 -> Cell(row, col)
@@ -240,4 +227,8 @@ private fun getRotatedCellAt(row: Int, col: Int, @IntRange(from = 0, to = 3) num
         3 -> Cell(col, GRID_SIZE - 1 - row)
         else -> throw IllegalArgumentException("numRotations must be an integer in [0,3]")
     }
+}
+
+private fun <T> List<List<T>>.map(transform: (row: Int, col: Int, T) -> T): List<List<T>> {
+    return mapIndexed { row, rowTiles -> rowTiles.mapIndexed { col, it -> transform(row, col, it) } }
 }

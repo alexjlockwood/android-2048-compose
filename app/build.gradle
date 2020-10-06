@@ -9,12 +9,10 @@ android {
 
     defaultConfig {
         applicationId "com.alexjlockwood.twentyfortyeightcompose"
-        minSdkVersion 23
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
