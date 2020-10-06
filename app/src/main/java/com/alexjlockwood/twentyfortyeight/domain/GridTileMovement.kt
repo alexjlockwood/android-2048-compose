@@ -1,18 +1,4 @@
-package com.alexjlockwood.twentyfortyeight
-
-data class Tile constructor(val num: Int, val id: Int) {
-    companion object {
-        private var tileIdCounter = 0
-    }
-
-    constructor(num: Int) : this(num, tileIdCounter++)
-
-    operator fun times(operand: Int): Tile = Tile(num * operand)
-}
-
-data class Cell(val row: Int, val col: Int)
-
-data class GridTile(val cell: Cell, val tile: Tile)
+package com.alexjlockwood.twentyfortyeight.domain
 
 data class GridTileMovement(val fromGridTile: GridTile?, val toGridTile: GridTile) {
     companion object {

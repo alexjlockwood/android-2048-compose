@@ -1,7 +1,8 @@
-package com.alexjlockwood.twentyfortyeight
+package com.alexjlockwood.twentyfortyeight.ui
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
+import com.alexjlockwood.twentyfortyeight.domain.Direction
 import kotlin.math.sqrt
 
 class SwipeDragObserver(

@@ -1,4 +1,4 @@
-package com.alexjlockwood.twentyfortyeight
+package com.alexjlockwood.twentyfortyeight.ui
 
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animatedFloat
@@ -7,49 +7,32 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawBehind
+import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.gesture.MinFlingVelocity
-import androidx.compose.ui.gesture.TouchSlop
-import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.onSizeChanged
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
+import com.alexjlockwood.twentyfortyeight.viewmodel.GRID_SIZE
 import kotlin.math.min
 
 private val GRID_TILE_RADIUS = 4.dp
 
 @Composable
-fun GameUi(
-    gridTileMovements: List<GridTileMovement>,
-    moveCount: Int,
-    onSwipeListener: (direction: Direction) -> Unit,
-) {
-    val dragObserver = with(DensityAmbient.current) {
-        SwipeDragObserver(TouchSlop.toPx(), MinFlingVelocity.toPx(), onSwipeListener)
-    }
-    Box(
-        modifier = Modifier.fillMaxSize().dragGestureFilter(dragObserver),
-        alignment = Alignment.Center,
-    ) {
-        GameGrid(
-            modifier = Modifier.aspectRatio(1f).fillMaxSize().padding(16.dp),
-            gridTileMovements = gridTileMovements,
-            moveCount = moveCount,
-        )
-    }
-}
-
-@Composable
-private fun GameGrid(
+fun GameGrid(
     modifier: Modifier = Modifier,
     gridTileMovements: List<GridTileMovement>,
     moveCount: Int,
@@ -119,6 +102,7 @@ private fun GridTileText(
                 color = getTileColor(num, isSystemInDarkTheme()),
                 shape = RoundedCornerShape(GRID_TILE_RADIUS),
             ).wrapContentSize(),
+        color = Color.White,
         fontSize = 18.sp,
     )
     onCommit(moveCount) {
