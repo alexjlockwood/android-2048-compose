@@ -1,6 +1,7 @@
 package com.alexjlockwood.twentyfortyeight.repository
 
 import android.content.Context
+import com.alexjlockwood.twentyfortyeight.domain.Tile
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -9,6 +10,9 @@ private const val KEY_GRID = "key_grid"
 private const val KEY_CURRENT_SCORE = "key_current_score"
 private const val KEY_BEST_SCORE = "key_best_score"
 
+/**
+ * Repository class that persists the current 2048 game to shared preferences.
+ */
 class GameRepository(context: Context) {
 
     private val sharedPrefs = context.getSharedPreferences(KEY_SHARED_PREFS, Context.MODE_PRIVATE)
@@ -22,12 +26,12 @@ class GameRepository(context: Context) {
     var bestScore: Int = sharedPrefs.getInt(KEY_BEST_SCORE, 0)
         private set
 
-    fun saveState(grid: List<List<Int?>>, currentScore: Int, bestScore: Int) {
-        this.grid = grid
+    fun saveState(grid: List<List<Tile?>>, currentScore: Int, bestScore: Int) {
+        this.grid = grid.map { tiles -> tiles.map { it?.num } }
         this.currentScore = currentScore
         this.bestScore = bestScore
         sharedPrefs.edit()
-            .putString(KEY_GRID, Gson().toJson(grid))
+            .putString(KEY_GRID, Gson().toJson(this.grid))
             .putInt(KEY_CURRENT_SCORE, currentScore)
             .putInt(KEY_BEST_SCORE, bestScore)
             .apply()

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.alexjlockwood.twentyfortyeight.repository.GameRepository
 
 class GameViewModelFactory(context: Context) : ViewModelProvider.Factory {
-
     private val context = context.applicationContext
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

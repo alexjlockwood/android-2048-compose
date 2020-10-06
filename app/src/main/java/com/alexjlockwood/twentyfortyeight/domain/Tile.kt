@@ -1,6 +1,8 @@
 package com.alexjlockwood.twentyfortyeight.domain
 
-/** Container class that wraps a number and a unique ID for use in the grid. */
+/**
+ * Container class that wraps a number and a unique ID for use in the grid.
+ */
 data class Tile constructor(val num: Int, val id: Int) {
     companion object {
         // We assign each tile a unique ID and use it to efficiently

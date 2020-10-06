@@ -5,6 +5,9 @@ import androidx.compose.ui.gesture.DragObserver
 import com.alexjlockwood.twentyfortyeight.domain.Direction
 import kotlin.math.sqrt
 
+/**
+ * A [DragObserver] that listens for swipe events in each of the 4 directions.
+ */
 class SwipeDragObserver(
     private val minTouchSlop: Float,
     private val minSwipeVelocity: Float,

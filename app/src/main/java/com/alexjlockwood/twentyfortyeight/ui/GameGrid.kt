@@ -31,6 +31,9 @@ import kotlin.math.min
 
 private val GRID_TILE_RADIUS = 4.dp
 
+/**
+ * Renders a grid of tiles that animates when game moves are made.
+ */
 @Composable
 fun GameGrid(
     modifier: Modifier = Modifier,
@@ -46,6 +49,7 @@ fun GameGrid(
 
     Box(
         modifier = modifier.drawBehind {
+            // Draw the background empty tiles.
             for (row in 0 until GRID_SIZE) {
                 for (col in 0 until GRID_SIZE) {
                     drawRoundRect(
@@ -59,10 +63,18 @@ fun GameGrid(
         }.onSizeChanged { size = it },
     ) {
         for (gridTileMovement in gridTileMovements) {
+            // Each grid tile is laid out at (0,0) in the box. Shifting tiles are then translated
+            // to their correct position in the grid, and added tiles are scaled from 0 to 1.
             val (fromGridTile, toGridTile) = gridTileMovement
             val fromScale = if (fromGridTile == null) 0f else 1f
             val toOffset = Offset(toGridTile.cell.col * tileOffsetPx, toGridTile.cell.row * tileOffsetPx)
             val fromOffset = fromGridTile?.let { Offset(it.cell.col * tileOffsetPx, it.cell.row * tileOffsetPx) } ?: toOffset
+
+            // In 2048, tiles are frequently being removed and added to grid. As a result,
+            // the order in which grid tiles are rendered is constantly changing after each
+            // recomposition. In order to ensure that each tile animates from its correct
+            // starting position, it is critical that we assign each tile a unique ID using
+            // the key() function.
             key(toGridTile.tile.id) {
                 GridTileText(
                     num = toGridTile.tile.num,
@@ -87,15 +99,14 @@ private fun GridTileText(
     moveCount: Int,
 ) {
     if (size == 0.dp) return
-    val animatedAppear = animatedFloat(fromScale)
+    val animatedScale = animatedFloat(fromScale)
     val animatedOffset = animatedValue(fromOffset, Offset.VectorConverter)
     Text(
         text = "$num",
         modifier = Modifier.size(size)
             .drawLayer(
-                alpha = animatedAppear.value,
-                scaleX = animatedAppear.value,
-                scaleY = animatedAppear.value,
+                scaleX = animatedScale.value,
+                scaleY = animatedScale.value,
                 translationX = animatedOffset.value.x,
                 translationY = animatedOffset.value.y,
             ).background(
@@ -106,8 +117,8 @@ private fun GridTileText(
         fontSize = 18.sp,
     )
     onCommit(moveCount) {
-        animatedAppear.snapTo(if (moveCount == 0) 1f else fromScale)
-        animatedAppear.animateTo(1f, tween(durationMillis = 200, delayMillis = 50))
+        animatedScale.snapTo(if (moveCount == 0) 1f else fromScale)
+        animatedScale.animateTo(1f, tween(durationMillis = 200, delayMillis = 50))
         animatedOffset.animateTo(toOffset, tween(durationMillis = 100))
     }
 }

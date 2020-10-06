@@ -1,6 +1,5 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
-import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
@@ -11,7 +10,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.gesture.MinFlingVelocity
@@ -19,7 +17,6 @@ import androidx.compose.ui.gesture.TouchSlop
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.ConfigurationAmbient
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +27,9 @@ import com.alexjlockwood.twentyfortyeight.R
 import com.alexjlockwood.twentyfortyeight.domain.Direction
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
 
+/**
+ * Renders the 2048 game's home screen UI.
+ */
 @Composable
 fun GameUi(
     gridTileMovements: List<GridTileMovement>,
@@ -56,23 +56,21 @@ fun GameUi(
         val dragObserver = with(DensityAmbient.current) {
             SwipeDragObserver(TouchSlop.toPx(), MinFlingVelocity.toPx(), onSwipeListener)
         }
-        val isPortrait = ConfigurationAmbient.current.orientation == ORIENTATION_PORTRAIT
-        Box(
-            modifier = Modifier.fillMaxSize().dragGestureFilter(dragObserver),
-            alignment = if (isPortrait) Alignment.TopCenter else Alignment.Center,
-        ) {
-            WithConstraints {
-                ConstraintLayout(buildConstraints(isPortrait)) {
-                    GameGrid(
-                        modifier = Modifier.aspectRatio(1f).padding(16.dp).layoutId("gameGrid"),
-                        gridTileMovements = gridTileMovements,
-                        moveCount = moveCount,
-                    )
-                    TextLabel(text = "$currentScore", layoutId = "currentScoreText", fontSize = 36.sp)
-                    TextLabel(text = "Score", layoutId = "currentScoreLabel", fontSize = 18.sp)
-                    TextLabel(text = "$bestScore", layoutId = "bestScoreText", fontSize = 36.sp)
-                    TextLabel(text = "Best", layoutId = "bestScoreLabel", fontSize = 18.sp)
-                }
+        WithConstraints {
+            val isPortrait = maxWidth < maxHeight
+            ConstraintLayout(
+                constraintSet = buildConstraints(isPortrait),
+                modifier = Modifier.fillMaxSize().dragGestureFilter(dragObserver),
+            ) {
+                GameGrid(
+                    modifier = Modifier.aspectRatio(1f).padding(16.dp).layoutId("gameGrid"),
+                    gridTileMovements = gridTileMovements,
+                    moveCount = moveCount,
+                )
+                TextLabel(text = "$currentScore", layoutId = "currentScoreText", fontSize = 36.sp)
+                TextLabel(text = "Score", layoutId = "currentScoreLabel", fontSize = 18.sp)
+                TextLabel(text = "$bestScore", layoutId = "bestScoreText", fontSize = 36.sp)
+                TextLabel(text = "Best", layoutId = "bestScoreLabel", fontSize = 18.sp)
             }
         }
     }
@@ -144,7 +142,6 @@ private fun buildConstraints(isPortrait: Boolean): ConstraintSet {
             constrain(gameGrid) {
                 start.linkTo(parent.start)
                 top.linkTo(parent.top)
-                end.linkTo(bestScoreLabel.start)
                 bottom.linkTo(parent.bottom)
             }
             constrain(currentScoreText) {
@@ -163,6 +160,7 @@ private fun buildConstraints(isPortrait: Boolean): ConstraintSet {
                 start.linkTo(gameGrid.end)
                 bottom.linkTo(gameGrid.bottom, 16.dp)
             }
+            createHorizontalChain(gameGrid, bestScoreLabel, chainStyle = ChainStyle.Packed)
         }
     }
 }
