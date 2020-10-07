@@ -70,7 +70,7 @@ fun GameGrid(
             val toOffset = Offset(toGridTile.cell.col * tileOffsetPx, toGridTile.cell.row * tileOffsetPx)
             val fromOffset = fromGridTile?.let { Offset(it.cell.col * tileOffsetPx, it.cell.row * tileOffsetPx) } ?: toOffset
 
-            // In 2048, tiles are frequently being removed and added to grid. As a result,
+            // In 2048, tiles are frequently being removed and added to the grid. As a result,
             // the order in which grid tiles are rendered is constantly changing after each
             // recomposition. In order to ensure that each tile animates from its correct
             // starting position, it is critical that we assign each tile a unique ID using
