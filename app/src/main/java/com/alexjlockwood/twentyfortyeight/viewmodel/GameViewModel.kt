@@ -49,13 +49,6 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
         }
     }
 
-    private fun addTileToGrid(addedGridTile: GridTile): GridTileMovement {
-        val (addedCell, addedTile) = addedGridTile
-        val (addedRow, addedCol) = addedCell
-        grid = grid.map { row, col, it -> if (row == addedRow && col == addedCol) addedTile else it }
-        return GridTileMovement.add(addedGridTile)
-    }
-
     fun startNewGame() {
         gridTileMovements = (0 until NUM_INITIAL_TILES).mapNotNull { createRandomAddedTile(EMPTY_GRID) }
         val addedGridTiles = gridTileMovements.map { it.toGridTile }
