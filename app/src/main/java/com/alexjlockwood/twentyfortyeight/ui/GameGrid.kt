@@ -11,18 +11,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.runtime.onCommit
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.onSizeChanged
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
@@ -40,50 +41,52 @@ fun GameGrid(
     gridTileMovements: List<GridTileMovement>,
     moveCount: Int,
 ) {
-    var size by remember { mutableStateOf(IntSize.Zero) }
-    val tileMarginPx = with(DensityAmbient.current) { 4.dp.toPx() }
-    val tileSizePx = ((min(size.width, size.height) - tileMarginPx * (GRID_SIZE - 1)) / GRID_SIZE).coerceAtLeast(0f)
-    val tileSizeDp = Dp(tileSizePx / DensityAmbient.current.density)
-    val tileOffsetPx = tileSizePx + tileMarginPx
-    val emptyTileColor = getEmptyTileColor(isSystemInDarkTheme())
-
-    Box(
-        modifier = modifier.drawBehind {
-            // Draw the background empty tiles.
-            for (row in 0 until GRID_SIZE) {
-                for (col in 0 until GRID_SIZE) {
-                    drawRoundRect(
-                        color = emptyTileColor,
-                        topLeft = Offset(col * tileOffsetPx, row * tileOffsetPx),
-                        size = Size(tileSizePx, tileSizePx),
-                        radius = Radius(GRID_TILE_RADIUS.toPx()),
-                    )
+    WithConstraints(modifier) {
+        val width = with(DensityAmbient.current) { maxWidth.toPx() }
+        val height = with(DensityAmbient.current) { maxHeight.toPx() }
+        val tileMarginPx = with(DensityAmbient.current) { 4.dp.toPx() }
+        val tileSizePx = ((min(width, height) - tileMarginPx * (GRID_SIZE - 1)) / GRID_SIZE).coerceAtLeast(0f)
+        val tileSizeDp = Dp(tileSizePx / DensityAmbient.current.density)
+        val tileOffsetPx = tileSizePx + tileMarginPx
+        val emptyTileColor = getEmptyTileColor(isSystemInDarkTheme())
+        Box(
+            modifier = Modifier.drawBehind {
+                // Draw the background empty tiles.
+                for (row in 0 until GRID_SIZE) {
+                    for (col in 0 until GRID_SIZE) {
+                        drawRoundRect(
+                            color = emptyTileColor,
+                            topLeft = Offset(col * tileOffsetPx, row * tileOffsetPx),
+                            size = Size(tileSizePx, tileSizePx),
+                            radius = Radius(GRID_TILE_RADIUS.toPx()),
+                        )
+                    }
                 }
             }
-        }.onSizeChanged { size = it },
-    ) {
-        for (gridTileMovement in gridTileMovements) {
-            // Each grid tile is laid out at (0,0) in the box. Shifting tiles are then translated
-            // to their correct position in the grid, and added tiles are scaled from 0 to 1.
-            val (fromGridTile, toGridTile) = gridTileMovement
-            val fromScale = if (fromGridTile == null) 0f else 1f
-            val toOffset = Offset(toGridTile.cell.col * tileOffsetPx, toGridTile.cell.row * tileOffsetPx)
-            val fromOffset = fromGridTile?.let { Offset(it.cell.col * tileOffsetPx, it.cell.row * tileOffsetPx) } ?: toOffset
+        ) {
+            for (gridTileMovement in gridTileMovements) {
+                // Each grid tile is laid out at (0,0) in the box. Shifting tiles are then translated
+                // to their correct position in the grid, and added tiles are scaled from 0 to 1.
+                val (fromGridTile, toGridTile) = gridTileMovement
+                val fromScale = if (fromGridTile == null) 0f else 1f
+                val toOffset = Offset(toGridTile.cell.col * tileOffsetPx, toGridTile.cell.row * tileOffsetPx)
+                val fromOffset = fromGridTile?.let { Offset(it.cell.col * tileOffsetPx, it.cell.row * tileOffsetPx) } ?: toOffset
 
-            // In 2048, tiles are frequently being removed and added to the grid. As a result,
-            // the order in which grid tiles are rendered is constantly changing after each
-            // recomposition. In order to ensure that each tile animates from its correct
-            // starting position, it is critical that we assign each tile a unique ID using
-            // the key() function.
-            key(toGridTile.tile.id) {
-                GridTileText(
-                    num = toGridTile.tile.num,
-                    size = tileSizeDp,
-                    fromScale = fromScale,
-                    fromOffset = fromOffset,
-                    toOffset = toOffset,
-                    moveCount = moveCount,
-                )
+                // In 2048, tiles are frequently being removed and added to the grid. As a result,
+                // the order in which grid tiles are rendered is constantly changing after each
+                // recomposition. In order to ensure that each tile animates from its correct
+                // starting position, it is critical that we assign each tile a unique ID using
+                // the key() function.
+                key(toGridTile.tile.id) {
+                    GridTileText(
+                        num = toGridTile.tile.num,
+                        size = tileSizeDp,
+                        fromScale = fromScale,
+                        fromOffset = fromOffset,
+                        toOffset = toOffset,
+                        moveCount = moveCount,
+                    )
+                }
             }
         }
     }
@@ -98,7 +101,6 @@ private fun GridTileText(
     toOffset: Offset,
     moveCount: Int,
 ) {
-    if (size == 0.dp) return
     val animatedScale = animatedFloat(fromScale)
     val animatedOffset = animatedValue(fromOffset, Offset.VectorConverter)
     Text(
