@@ -1,23 +1,18 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.gesture.MinFlingVelocity
 import androidx.compose.ui.gesture.TouchSlop
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
@@ -53,7 +48,7 @@ fun GameUi(
             )
         }
     ) {
-        val dragObserver = with(DensityAmbient.current) {
+        val dragObserver = with(AmbientDensity.current) {
             SwipeDragObserver(TouchSlop.toPx(), MinFlingVelocity.toPx(), onSwipeListener)
         }
         WithConstraints {

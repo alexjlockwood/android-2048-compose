@@ -4,25 +4,25 @@ import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animatedFloat
 import androidx.compose.animation.animatedValue
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.onCommit
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.WithConstraints
-import androidx.compose.ui.drawBehind
-import androidx.compose.ui.drawLayer
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.WithConstraints
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,11 +42,11 @@ fun GameGrid(
     moveCount: Int,
 ) {
     WithConstraints(modifier) {
-        val width = with(DensityAmbient.current) { maxWidth.toPx() }
-        val height = with(DensityAmbient.current) { maxHeight.toPx() }
-        val tileMarginPx = with(DensityAmbient.current) { 4.dp.toPx() }
+        val width = with(AmbientDensity.current) { maxWidth.toPx() }
+        val height = with(AmbientDensity.current) { maxHeight.toPx() }
+        val tileMarginPx = with(AmbientDensity.current) { 4.dp.toPx() }
         val tileSizePx = ((min(width, height) - tileMarginPx * (GRID_SIZE - 1)) / GRID_SIZE).coerceAtLeast(0f)
-        val tileSizeDp = Dp(tileSizePx / DensityAmbient.current.density)
+        val tileSizeDp = Dp(tileSizePx / AmbientDensity.current.density)
         val tileOffsetPx = tileSizePx + tileMarginPx
         val emptyTileColor = getEmptyTileColor(isSystemInDarkTheme())
         Box(
@@ -58,7 +58,7 @@ fun GameGrid(
                             color = emptyTileColor,
                             topLeft = Offset(col * tileOffsetPx, row * tileOffsetPx),
                             size = Size(tileSizePx, tileSizePx),
-                            radius = Radius(GRID_TILE_RADIUS.toPx()),
+                            cornerRadius = CornerRadius(GRID_TILE_RADIUS.toPx()),
                         )
                     }
                 }
@@ -106,7 +106,7 @@ private fun GridTileText(
     Text(
         text = "$num",
         modifier = Modifier.size(size)
-            .drawLayer(
+            .graphicsLayer(
                 scaleX = animatedScale.value,
                 scaleY = animatedScale.value,
                 translationX = animatedOffset.value.x,
