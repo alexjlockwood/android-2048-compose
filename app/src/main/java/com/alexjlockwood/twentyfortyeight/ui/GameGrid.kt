@@ -1,8 +1,8 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
-import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animatedFloat
 import androidx.compose.animation.animatedValue
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme

@@ -3,7 +3,6 @@ package com.alexjlockwood.twentyfortyeight
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.platform.setContent
 import com.alexjlockwood.twentyfortyeight.ui.AppTheme
@@ -20,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             AppTheme {
-                Surface(color = MaterialTheme.colors.background) {
+                Surface {
                     GameUi(
                         gridTileMovements = gameViewModel.gridTileMovements,
                         currentScore = gameViewModel.currentScore,
