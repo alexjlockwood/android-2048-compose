@@ -36,29 +36,24 @@ fun GameUi(
     onSwipeListener: (direction: Direction) -> Unit,
 ) {
     var shouldShowNewGameDialog by remember { mutableStateOf(false) }
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                contentColor = Color.White,
-                backgroundColor = MaterialTheme.colors.primaryVariant,
-                actions = {
-                    IconButton(onClick = { shouldShowNewGameDialog = true }) { Icon(Icons.Filled.Add) }
-                }
-            )
-        }
-    ) {
+    Scaffold {
         val dragObserver = with(AmbientDensity.current) {
             SwipeDragObserver(TouchSlop.toPx(), MinFlingVelocity.toPx(), onSwipeListener)
         }
+
         WithConstraints {
             val isPortrait = maxWidth < maxHeight
             ConstraintLayout(
                 constraintSet = buildConstraints(isPortrait),
-                modifier = Modifier.fillMaxSize().dragGestureFilter(dragObserver),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .dragGestureFilter(dragObserver),
             ) {
                 GameGrid(
-                    modifier = Modifier.aspectRatio(1f).padding(16.dp).layoutId("gameGrid"),
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .padding(16.dp)
+                        .layoutId("gameGrid"),
                     gridTileMovements = gridTileMovements,
                     moveCount = moveCount,
                 )
@@ -69,6 +64,7 @@ fun GameUi(
             }
         }
     }
+
     if (isGameOver) {
         GameDialog(
             title = "Game over",
