@@ -14,6 +14,7 @@ import com.alexjlockwood.twentyfortyeight.viewmodel.GameViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
