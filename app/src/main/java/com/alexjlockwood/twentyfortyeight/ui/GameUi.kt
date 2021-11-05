@@ -1,5 +1,6 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -13,8 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,13 +30,13 @@ import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
  */
 @Composable
 fun GameUi(
-    gridTileMovements: List<GridTileMovement>,
-    currentScore: Int,
-    bestScore: Int,
-    moveCount: Int,
-    isGameOver: Boolean,
-    onNewGameRequested: () -> Unit,
-    onSwipeListener: (direction: Direction) -> Unit,
+        gridTileMovements: List<GridTileMovement>,
+        currentScore: Int,
+        bestScore: Int,
+        moveCount: Int,
+        isGameOver: Boolean,
+        onNewGameRequested: () -> Unit,
+        onSwipeListener: (direction: Direction) -> Unit,
 ) {
     var shouldShowNewGameDialog by remember { mutableStateOf(false) }
     Scaffold {
@@ -44,47 +47,55 @@ fun GameUi(
         WithConstraints {
             val isPortrait = maxWidth < maxHeight
             ConstraintLayout(
-                constraintSet = buildConstraints(isPortrait),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .dragGestureFilter(dragObserver),
+                    constraintSet = buildConstraints(isPortrait),
+                    modifier = Modifier
+                            .fillMaxSize()
+                            .dragGestureFilter(dragObserver),
             ) {
                 GameGrid(
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .padding(16.dp)
-                        .layoutId("gameGrid"),
-                    gridTileMovements = gridTileMovements,
-                    moveCount = moveCount,
+                        modifier = Modifier
+                                .aspectRatio(1f)
+                                .padding(16.dp)
+                                .layoutId("gameGrid"),
+                        gridTileMovements = gridTileMovements,
+                        moveCount = moveCount,
                 )
                 TextLabel(text = "$currentScore", layoutId = "currentScoreText", fontSize = 36.sp)
                 TextLabel(text = "Score", layoutId = "currentScoreLabel", fontSize = 18.sp)
+
                 TextLabel(text = "$bestScore", layoutId = "bestScoreText", fontSize = 36.sp)
                 TextLabel(text = "Best", layoutId = "bestScoreLabel", fontSize = 18.sp)
+
+                Icon(painterResource(R.drawable.ic_refresh), modifier = Modifier
+                        .padding(16.dp)
+                        .layoutId("refresh")
+                        .clickable {
+                            shouldShowNewGameDialog = true
+                        })
             }
         }
     }
 
     if (isGameOver) {
         GameDialog(
-            title = "Game over",
-            message = "Start a new game?",
-            onConfirmListener = { onNewGameRequested.invoke() },
-            onDismissListener = {
-                // TODO: allow user to dismiss the dialog so they can take a screenshot
-            },
+                title = "Game over",
+                message = "Start a new game?",
+                onConfirmListener = { onNewGameRequested.invoke() },
+                onDismissListener = {
+                    // TODO: allow user to dismiss the dialog so they can take a screenshot
+                },
         )
     } else if (shouldShowNewGameDialog) {
         GameDialog(
-            title = "Start a new game?",
-            message = "Starting a new game will erase your current game",
-            onConfirmListener = {
-                onNewGameRequested.invoke()
-                shouldShowNewGameDialog = false
-            },
-            onDismissListener = {
-                shouldShowNewGameDialog = false
-            },
+                title = "Start a new game?",
+                message = "Starting a new game will erase your current game",
+                onConfirmListener = {
+                    onNewGameRequested.invoke()
+                    shouldShowNewGameDialog = false
+                },
+                onDismissListener = {
+                    shouldShowNewGameDialog = false
+                },
         )
     }
 }
@@ -92,10 +103,10 @@ fun GameUi(
 @Composable
 private fun TextLabel(text: String, layoutId: String, fontSize: TextUnit) {
     Text(
-        text = text,
-        modifier = Modifier.layoutId(layoutId),
-        fontSize = fontSize,
-        fontWeight = FontWeight.Light,
+            text = text,
+            modifier = Modifier.layoutId(layoutId),
+            fontSize = fontSize,
+            fontWeight = FontWeight.Light,
     )
 }
 
@@ -106,11 +117,13 @@ private fun buildConstraints(isPortrait: Boolean): ConstraintSet {
         val currentScoreLabel = createRefFor("currentScoreLabel")
         val bestScoreText = createRefFor("bestScoreText")
         val bestScoreLabel = createRefFor("bestScoreLabel")
+        val refresh = createRefFor("refresh")
 
         if (isPortrait) {
             constrain(gameGrid) {
                 start.linkTo(parent.start)
                 top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
                 end.linkTo(parent.end)
             }
             constrain(currentScoreText) {
@@ -129,6 +142,12 @@ private fun buildConstraints(isPortrait: Boolean): ConstraintSet {
                 end.linkTo(bestScoreText.end)
                 top.linkTo(bestScoreText.bottom)
             }
+            constrain(refresh) {
+                end.linkTo(parent.end)
+                start.linkTo(parent.start)
+                top.linkTo(bestScoreLabel.bottom)
+            }
+
         } else {
             constrain(gameGrid) {
                 start.linkTo(parent.start)
@@ -148,6 +167,10 @@ private fun buildConstraints(isPortrait: Boolean): ConstraintSet {
                 bottom.linkTo(bestScoreLabel.top)
             }
             constrain(bestScoreLabel) {
+                start.linkTo(gameGrid.end)
+                bottom.linkTo(refresh.top)
+            }
+            constrain(refresh) {
                 start.linkTo(gameGrid.end)
                 bottom.linkTo(gameGrid.bottom, 16.dp)
             }
