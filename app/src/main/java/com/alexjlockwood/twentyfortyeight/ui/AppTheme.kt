@@ -6,15 +6,18 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import com.alexjlockwood.twentyfortyeight.R
 
-private val DarkColorPalette = darkColors(primaryVariant = Color(0xff3f51b5))
-private val LightColorPalette = lightColors(primaryVariant = Color(0xff1da9da))
 
 @Composable
 fun AppTheme(content: @Composable () -> Unit) {
+    val DarkColorPalette = darkColors(primaryVariant = colorResource(id = R.color.md_theme_light_primary))
+    val LightColorPalette = lightColors(primaryVariant = colorResource(id = R.color.md_theme_dark_primary))
+
     val colors = if (isSystemInDarkTheme()) DarkColorPalette else LightColorPalette
     MaterialTheme(
-        colors = colors,
-        content = content,
+            colors = colors,
+            content = content,
     )
 }
