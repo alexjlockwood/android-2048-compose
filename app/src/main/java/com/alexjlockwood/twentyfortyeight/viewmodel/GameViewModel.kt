@@ -68,7 +68,7 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
         }
 
         // Increment the score.
-        val scoreIncrement = updatedGridTileMovements.filter { it.fromGridTile == null }.sumBy { it.toGridTile.tile.num }
+        val scoreIncrement = updatedGridTileMovements.filter { it.fromGridTile == null }.sumOf { it.toGridTile.tile.num }
         currentScore += scoreIncrement
         bestScore = max(bestScore, currentScore)
 
