@@ -1,21 +1,22 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,11 +26,13 @@ import androidx.constraintlayout.compose.ConstraintSet
 import com.alexjlockwood.twentyfortyeight.R
 import com.alexjlockwood.twentyfortyeight.domain.Direction
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
+import kotlinx.coroutines.*
 import kotlin.math.sqrt
 
 /**
  * Renders the 2048 game's home screen UI.
  */
+@ExperimentalMaterial3Api
 @Composable
 fun GameUi(
     gridTileMovements: List<GridTileMovement>,
@@ -43,10 +46,17 @@ fun GameUi(
     var shouldShowNewGameDialog by remember { mutableStateOf(false) }
     var totalDragDistance = remember { Offset.Zero }
     val minTouchSlop = 18.dp
-    //val minSwipeVelocity = 50.dp
 
-
-    Scaffold {
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    shouldShowNewGameDialog = true
+                }) {
+                Icon(Icons.Default.Refresh, stringResource(R.string.accessibility_new_game))
+            }
+        }
+    ) {
         BoxWithConstraints {
             val isPortrait = maxWidth < maxHeight
 
@@ -54,7 +64,7 @@ fun GameUi(
                 constraintSet = buildConstraints(isPortrait = isPortrait),
                 modifier = Modifier
                     .fillMaxSize()
-                    .pointerInput("Hello") {
+                    .pointerInput(moveCount) {
                         detectDragGestures(
                             onDragStart = {
                                 totalDragDistance = Offset.Zero
@@ -66,24 +76,19 @@ fun GameUi(
                                 totalDragDistance = Offset.Zero
                             },
                             onDragEnd = {
-                                val (dx, dy) = totalDragDistance
-                                val swipeDistance = dist(dx, dy)
-                                if (swipeDistance >= minTouchSlop.value) {
-
-                                    val swipeAngle = atan2(dx, -dy)
-                                    onSwipeListener(
-                                        when {
-                                            45 <= swipeAngle && swipeAngle < 135 -> Direction.NORTH
-                                            135 <= swipeAngle && swipeAngle < 225 -> Direction.WEST
-                                            225 <= swipeAngle && swipeAngle < 315 -> Direction.SOUTH
-                                            else -> Direction.EAST
-                                        }
-                                    )
-                                }
+                                endDrag(totalDragDistance, minTouchSlop, onSwipeListener)
                             }
                         )
                     }
             ) {
+                Image(
+                    painterResource(id = getImageBackground(isSystemInDarkTheme())),
+                    contentDescription = "",
+                    Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.FillHeight
+                )
+
                 GameGrid(
                     modifier = Modifier
                         .aspectRatio(1f)
@@ -93,37 +98,41 @@ fun GameUi(
                     moveCount = moveCount,
                 )
                 TextLabel(text = "$currentScore", layoutId = "currentScoreText", fontSize = 36.sp)
-                TextLabel(text = "Score", layoutId = "currentScoreLabel", fontSize = 18.sp)
+                TextLabel(
+                    text = stringResource(R.string.label_score),
+                    layoutId = "currentScoreLabel",
+                    fontSize = 18.sp
+                )
 
                 TextLabel(text = "$bestScore", layoutId = "bestScoreText", fontSize = 36.sp)
-                TextLabel(text = "Best", layoutId = "bestScoreLabel", fontSize = 18.sp)
-
-                Image(
-                    painter = painterResource(R.drawable.ic_refresh),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .layoutId("refresh")
-                        .clickable {
-                            shouldShowNewGameDialog = true
-                        })
+                TextLabel(
+                    text = stringResource(R.string.label_best),
+                    layoutId = "bestScoreLabel",
+                    fontSize = 18.sp
+                )
+                Button(onClick = {}, modifier = Modifier.layoutId("ratingBtn")) {
+                    Text(text = "Rating")
+                }
+                Button(onClick = {}, modifier = Modifier.layoutId("achievementsBtn")) {
+                    Text(text = "Achievements")
+                }
             }
         }
     }
 
     if (isGameOver) {
         GameDialog(
-            title = "Game over",
-            message = "Start a new game?",
+            title = stringResource(R.string.dialog_game_over_title),
+            message = stringResource(R.string.dialog_game_over_description),
             onConfirmListener = { onNewGameRequested.invoke() },
             onDismissListener = {
-                // TODO: allow user to dismiss the dialog so they can take a screenshot
+                shouldShowNewGameDialog = false
             },
         )
     } else if (shouldShowNewGameDialog) {
         GameDialog(
-            title = "Start a new game?",
-            message = "Starting a new game will erase your current game",
+            title = stringResource(R.string.dialog_new_game_title),
+            message = stringResource(R.string.dialog_new_game_description),
             onConfirmListener = {
                 onNewGameRequested.invoke()
                 shouldShowNewGameDialog = false
@@ -153,12 +162,13 @@ private fun buildConstraints(isPortrait: Boolean): ConstraintSet {
         val bestScoreText = createRefFor("bestScoreText")
         val bestScoreLabel = createRefFor("bestScoreLabel")
         val refresh = createRefFor("refresh")
+        val ratingBtn = createRefFor("ratingBtn")
+        val achievementsBtn = createRefFor("achievementsBtn")
 
         if (isPortrait) {
             constrain(gameGrid) {
                 start.linkTo(parent.start)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
+                top.linkTo(achievementsBtn.bottom, 24.dp)
                 end.linkTo(parent.end)
             }
             constrain(currentScoreText) {
@@ -181,6 +191,14 @@ private fun buildConstraints(isPortrait: Boolean): ConstraintSet {
                 end.linkTo(parent.end)
                 start.linkTo(parent.start)
                 top.linkTo(bestScoreLabel.bottom)
+            }
+            constrain(ratingBtn) {
+                start.linkTo(parent.start, 24.dp)
+                top.linkTo(parent.top, 24.dp)
+            }
+            constrain(achievementsBtn) {
+                end.linkTo(parent.end, 24.dp)
+                top.linkTo(parent.top, 24.dp)
             }
 
         } else {
@@ -209,6 +227,14 @@ private fun buildConstraints(isPortrait: Boolean): ConstraintSet {
                 start.linkTo(gameGrid.end)
                 bottom.linkTo(gameGrid.bottom, 16.dp)
             }
+            constrain(ratingBtn) {
+                start.linkTo(parent.start, 24.dp)
+                top.linkTo(parent.top, 16.dp)
+            }
+            constrain(achievementsBtn) {
+                start.linkTo(parent.start, 24.dp)
+                top.linkTo(ratingBtn.bottom, 8.dp)
+            }
             createHorizontalChain(gameGrid, bestScoreLabel, chainStyle = ChainStyle.Packed)
         }
     }
@@ -224,4 +250,33 @@ private fun atan2(x: Float, y: Float): Float {
         degrees += 360
     }
     return degrees
+}
+
+private fun endDrag(
+    totalDragDistance: Offset,
+    minTouchSlop: Dp,
+    onSwipeListener: (direction: Direction) -> Unit
+) {
+    val (dx, dy) = totalDragDistance
+    val swipeDistance = dist(dx, dy)
+    if (swipeDistance >= minTouchSlop.value) {
+
+        val swipeAngle = atan2(dx, -dy)
+        onSwipeListener(
+            when {
+                45 <= swipeAngle && swipeAngle < 135 -> Direction.NORTH
+                135 <= swipeAngle && swipeAngle < 225 -> Direction.WEST
+                225 <= swipeAngle && swipeAngle < 315 -> Direction.SOUTH
+                else -> Direction.EAST
+            }
+        )
+    }
+}
+
+private fun getImageBackground(isDarkTheme: Boolean): Int {
+    return if (isDarkTheme) {
+        R.drawable.background_night
+    } else {
+        R.drawable.background
+    }
 }

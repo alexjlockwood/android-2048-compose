@@ -4,4 +4,13 @@
     <string name="app_id" translatable="false">602182388790</string>
     <!--package_name-->
     <string name="package_name" translatable="false">ru.denwa.2048game</string>
+    <string name="label_score">Score</string>
+    <string name="label_best">Best</string>
+    <string name="dialog_game_over_title">Game over</string>
+    <string name="dialog_game_over_description">Start a new game?</string>
+    <string name="dialog_new_game_title">Start a new game?</string>
+    <string name="dialog_new_game_description">Starting a new game will erase your current game</string>
+    <string name="dialog_positive">Ok</string>
+    <string name="dialog_negative">Cancel</string>
+    <string name="accessibility_new_game">New game</string>
 </resources>
