@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -20,13 +20,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
 import com.alexjlockwood.twentyfortyeight.viewmodel.GRID_SIZE
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import com.alexjlockwood.twentyfortyeight.R
 import kotlin.math.min
 
 private val GRID_TILE_RADIUS = 4.dp
@@ -51,7 +51,7 @@ fun GameGrid(
             ) - tileMarginPx * (GRID_SIZE - 1)) / GRID_SIZE).coerceAtLeast(0f)
         val tileSizeDp = Dp(tileSizePx / LocalDensity.current.density)
         val tileOffsetPx = tileSizePx + tileMarginPx
-        val emptyTileColor = getEmptyTileColor(isSystemInDarkTheme())
+        val emptyTileColor = colorResource(id = getEmptyTileColor(isSystemInDarkTheme()))
         Box(
             modifier = Modifier.drawBehind {
                 // Draw the background empty tiles.
@@ -166,6 +166,10 @@ private fun getTileColor(num: Int, isDarkTheme: Boolean): Color {
     }
 }
 
-private fun getEmptyTileColor(isDarkTheme: Boolean): Color {
-    return Color(if (isDarkTheme) 0xff444444 else 0xffdddddd)
+private fun getEmptyTileColor(isDarkTheme: Boolean): Int {
+    return if (isDarkTheme) {
+        R.color.md_theme_dark_card_background
+    } else {
+        R.color.md_theme_light_card_background
+    }
 }

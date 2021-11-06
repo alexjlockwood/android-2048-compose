@@ -10,5 +10,4 @@ class App : Application() {
 
         DynamicColors.applyToActivitiesIfAvailable(this)
     }
-
 }
