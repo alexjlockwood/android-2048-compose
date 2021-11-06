@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">2048 Compose</string>
-    <!--app_id-->
-    <string name="app_id" translatable="false">602182388790</string>
-    <!--package_name-->
-    <string name="package_name" translatable="false">ru.denwa.2048game</string>
+
     <string name="label_score">Score</string>
     <string name="label_best">Best</string>
     <string name="dialog_game_over_title">Game over</string>

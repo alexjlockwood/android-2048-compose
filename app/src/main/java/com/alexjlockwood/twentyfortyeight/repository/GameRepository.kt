@@ -1,7 +1,11 @@
 package com.alexjlockwood.twentyfortyeight.repository
 
 import android.content.Context
+import android.provider.Settings.Global.getString
+import com.alexjlockwood.twentyfortyeight.R
 import com.alexjlockwood.twentyfortyeight.domain.Tile
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.games.Games
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -13,7 +17,7 @@ private const val KEY_BEST_SCORE = "key_best_score"
 /**
  * Repository class that persists the current 2048 game to shared preferences.
  */
-class GameRepository(context: Context) {
+class GameRepository(private val context: Context) {
 
     private val sharedPrefs = context.getSharedPreferences(KEY_SHARED_PREFS, Context.MODE_PRIVATE)
 
@@ -31,11 +35,23 @@ class GameRepository(context: Context) {
         this.currentScore = currentScore
         this.bestScore = bestScore
         sharedPrefs.edit()
-                .putString(KEY_GRID, Gson().toJson(this.grid))
-                .putInt(KEY_CURRENT_SCORE, currentScore)
-                .putInt(KEY_BEST_SCORE, bestScore)
-                .apply()
+            .putString(KEY_GRID, Gson().toJson(this.grid))
+            .putInt(KEY_CURRENT_SCORE, currentScore)
+            .putInt(KEY_BEST_SCORE, bestScore)
+            .apply()
+
+        saveLeaderboard(context, currentScore.toLong())
+    }
+
+    private fun saveLeaderboard(context: Context, score: Long) {
+        if (score < 0) return
+
+        GoogleSignIn.getLastSignedInAccount(context)?.let {
+            Games.getLeaderboardsClient(context, it)
+                .submitScore(context.getString(R.string.leaderboard), score)
+        }
     }
 }
 
-private inline fun <reified T> Gson.fromJson(json: String) = fromJson<T>(json, object : TypeToken<T>() {}.type)
+private inline fun <reified T> Gson.fromJson(json: String) =
+    fromJson<T>(json, object : TypeToken<T>() {}.type)

@@ -1,9 +1,14 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
@@ -26,7 +31,8 @@ import androidx.constraintlayout.compose.ConstraintSet
 import com.alexjlockwood.twentyfortyeight.R
 import com.alexjlockwood.twentyfortyeight.domain.Direction
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
-import kotlinx.coroutines.*
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.games.Games.getLeaderboardsClient
 import kotlin.math.sqrt
 
 /**
@@ -42,6 +48,8 @@ fun GameUi(
     isGameOver: Boolean,
     onNewGameRequested: () -> Unit,
     onSwipeListener: (direction: Direction) -> Unit,
+    context: Context,
+    startRating: (intent: Intent) -> Unit
 ) {
     var shouldShowNewGameDialog by remember { mutableStateOf(false) }
     var totalDragDistance = remember { Offset.Zero }
@@ -110,7 +118,9 @@ fun GameUi(
                     layoutId = "bestScoreLabel",
                     fontSize = 18.sp
                 )
-                Button(onClick = {}, modifier = Modifier.layoutId("ratingBtn")) {
+                Button(onClick = {
+                    showLeaderBoard(context = context, startRating)
+                }, modifier = Modifier.layoutId("ratingBtn")) {
                     Text(text = "Rating")
                 }
                 Button(onClick = {}, modifier = Modifier.layoutId("achievementsBtn")) {
@@ -278,5 +288,15 @@ private fun getImageBackground(isDarkTheme: Boolean): Int {
         R.drawable.background_night
     } else {
         R.drawable.background
+    }
+}
+
+private fun showLeaderBoard(context: Context, startRating: (intent: Intent) -> Unit) {
+    GoogleSignIn.getLastSignedInAccount(context)?.let {
+        getLeaderboardsClient(context, it)
+            .getLeaderboardIntent(context.getString(R.string.leaderboard))
+            .addOnSuccessListener { intent ->
+                startRating.invoke(intent)
+            }
     }
 }

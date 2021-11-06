@@ -13,8 +13,8 @@ android {
         applicationId "ru.denwa.game_puzzle"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
 
     buildTypes {
@@ -64,4 +64,8 @@ dependencies {
 
     //gson
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    //game play services
+    implementation 'com.google.android.gms:play-services-auth:19.2.0'
+    implementation 'com.google.android.gms:play-services-games:21.0.0'
 }
