@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--app_id-->
+    <string name="app_id" translatable="false">602182388790</string>
+    <!--package_name-->
+    <string name="package_name" translatable="false">ru.denwa.2048game</string>
+    <!--leaderboard Рейтинг игроков-->
+    <string name="leaderboard" translatable="false">CgkItpj4psMREAIQAg</string>
+</resources>
