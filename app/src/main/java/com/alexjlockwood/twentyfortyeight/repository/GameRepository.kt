@@ -31,10 +31,10 @@ class GameRepository(context: Context) {
         this.currentScore = currentScore
         this.bestScore = bestScore
         sharedPrefs.edit()
-            .putString(KEY_GRID, Gson().toJson(this.grid))
-            .putInt(KEY_CURRENT_SCORE, currentScore)
-            .putInt(KEY_BEST_SCORE, bestScore)
-            .apply()
+                .putString(KEY_GRID, Gson().toJson(this.grid))
+                .putInt(KEY_CURRENT_SCORE, currentScore)
+                .putInt(KEY_BEST_SCORE, bestScore)
+                .apply()
     }
 }
 
