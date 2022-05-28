@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -32,6 +32,7 @@ import com.alexjlockwood.twentyfortyeight.R
 import com.alexjlockwood.twentyfortyeight.domain.Direction
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.games.Games.getAchievementsClient
 import com.google.android.gms.games.Games.getLeaderboardsClient
 import kotlin.math.sqrt
 
@@ -49,7 +50,7 @@ fun GameUi(
     onNewGameRequested: () -> Unit,
     onSwipeListener: (direction: Direction) -> Unit,
     context: Context,
-    startRating: (intent: Intent) -> Unit
+    startActivity: (intent: Intent) -> Unit
 ) {
     var shouldShowNewGameDialog by remember { mutableStateOf(false) }
     var totalDragDistance = remember { Offset.Zero }
@@ -119,11 +120,23 @@ fun GameUi(
                     fontSize = 18.sp
                 )
                 Button(onClick = {
-                    showLeaderBoard(context = context, startRating)
+                    showLeaderBoard(context = context, startActivity)
                 }, modifier = Modifier.layoutId("ratingBtn")) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Rating",
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
                     Text(text = "Rating")
                 }
-                Button(onClick = {}, modifier = Modifier.layoutId("achievementsBtn")) {
+                Button(onClick = {
+                    showAchievements(context = context, startActivity)
+                }, modifier = Modifier.layoutId("achievementsBtn")) {
+                    Icon(
+                        imageVector = Icons.Default.Face,
+                        contentDescription = "Achievements",
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
                     Text(text = "Achievements")
                 }
             }
@@ -203,11 +216,11 @@ private fun buildConstraints(isPortrait: Boolean): ConstraintSet {
                 top.linkTo(bestScoreLabel.bottom)
             }
             constrain(ratingBtn) {
-                start.linkTo(parent.start, 24.dp)
+                start.linkTo(parent.start, 16.dp)
                 top.linkTo(parent.top, 24.dp)
             }
             constrain(achievementsBtn) {
-                end.linkTo(parent.end, 24.dp)
+                end.linkTo(parent.end, 16.dp)
                 top.linkTo(parent.top, 24.dp)
             }
 
@@ -291,12 +304,22 @@ private fun getImageBackground(isDarkTheme: Boolean): Int {
     }
 }
 
-private fun showLeaderBoard(context: Context, startRating: (intent: Intent) -> Unit) {
+private fun showLeaderBoard(context: Context, startActivity: (intent: Intent) -> Unit) {
     GoogleSignIn.getLastSignedInAccount(context)?.let {
         getLeaderboardsClient(context, it)
             .getLeaderboardIntent(context.getString(R.string.leaderboard))
             .addOnSuccessListener { intent ->
-                startRating.invoke(intent)
+                startActivity.invoke(intent)
+            }
+    }
+}
+
+private fun showAchievements(context: Context, startActivity: (intent: Intent) -> Unit) {
+    GoogleSignIn.getLastSignedInAccount(context)?.let {
+        getAchievementsClient(context, it)
+            .achievementsIntent
+            .addOnSuccessListener { intent ->
+                startActivity.invoke(intent)
             }
     }
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">2048 Compose</string>
+    <string name="app_name">2048 Puzzle</string>
 
     <string name="label_score">Score</string>
     <string name="label_best">Best</string>

@@ -1,7 +1,6 @@
 package com.alexjlockwood.twentyfortyeight
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -46,10 +45,8 @@ class MainActivity : AppCompatActivity() {
                         isGameOver = gameViewModel.isGameOver,
                         onNewGameRequested = { gameViewModel.startNewGame() },
                         onSwipeListener = { direction -> gameViewModel.move(direction) },
-                        context = this,
-                        startRating = { intent ->
-                            startActivity(intent)
-                        }
+                        context = this@MainActivity,
+                        startActivity = { intent -> startActivity(intent) }
                     )
                 }
             }
@@ -64,9 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun signIn() {
         mGoogleSignInClient?.silentSignIn()?.addOnSuccessListener {
-            if(it != null){
-                Log.d("trekdeks", "hello + $it")
-            }
+
         }
     }
 
