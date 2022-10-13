@@ -66,7 +66,9 @@ fun GameUi(
             }
         }
     ) {
-        BoxWithConstraints {
+        BoxWithConstraints(
+            modifier = Modifier.padding(bottom = it.calculateBottomPadding())
+        ) {
             val isPortrait = maxWidth < maxHeight
 
             ConstraintLayout(

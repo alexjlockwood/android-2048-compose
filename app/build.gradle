@@ -6,15 +6,15 @@ plugins {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "ru.denwa.game_puzzle"
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 2
-        versionName "1.1"
+        targetSdkVersion 33
+        versionCode 3
+        versionName "1.2"
     }
 
     buildTypes {
@@ -43,20 +43,20 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.activity:activity-ktx:1.4.0'
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'androidx.activity:activity-ktx:1.6.0'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
 
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-tooling:$compose_version"
 
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
-    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-rc01"
-    implementation "androidx.activity:activity-compose:1.4.0"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha04"
+    implementation "androidx.activity:activity-compose:1.6.0"
 
     //material design
-    implementation 'com.google.android.material:material:1.5.0-alpha05'
-    implementation "androidx.compose.material3:material3:1.0.0-alpha01"
+    implementation 'com.google.android.material:material:1.8.0-alpha01'
+    implementation "androidx.compose.material3:material3:1.0.0-beta03"
 
     //firebase
     implementation platform('com.google.firebase:firebase-bom:29.0.0')
@@ -66,6 +66,6 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
 
     //game play services
-    implementation 'com.google.android.gms:play-services-auth:19.2.0'
-    implementation 'com.google.android.gms:play-services-games:21.0.0'
+    implementation 'com.google.android.gms:play-services-auth:20.3.0'
+    implementation 'com.google.android.gms:play-services-games:23.0.0'
 }
