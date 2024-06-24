@@ -2,13 +2,14 @@ package com.alexjlockwood.twentyfortyeight.viewmodel
 
 import androidx.annotation.IntRange
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.alexjlockwood.twentyfortyeight.domain.*
 import com.alexjlockwood.twentyfortyeight.repository.GameRepository
-import com.google.android.material.math.MathUtils.floorMod
 import kotlin.math.max
+import kotlin.random.Random
 
 const val GRID_SIZE = 4
 private const val NUM_INITIAL_TILES = 2
@@ -22,17 +23,18 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
     private var grid: List<List<Tile?>> = EMPTY_GRID
     var gridTileMovements by mutableStateOf<List<GridTileMovement>>(listOf())
         private set
-    var currentScore by mutableStateOf(gameRepository.currentScore)
+    var currentScore by mutableIntStateOf(0)
         private set
-    var bestScore by mutableStateOf(gameRepository.bestScore)
+    var bestScore by mutableIntStateOf(0)
         private set
     var isGameOver by mutableStateOf(false)
         private set
-    var moveCount by mutableStateOf(0)
+    var moveCount by mutableIntStateOf(0)
         private set
 
     init {
         val savedGrid = gameRepository.grid
+        bestScore = gameRepository.bestScore
         if (savedGrid == null) {
             startNewGame()
         } else {
@@ -44,7 +46,6 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
                 }
             }.filterNotNull()
             currentScore = gameRepository.currentScore
-            bestScore = gameRepository.bestScore
             isGameOver = checkIsGameOver(this.grid)
         }
     }
@@ -68,7 +69,7 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
         }
 
         // Increment the score.
-        val scoreIncrement = updatedGridTileMovements.filter { it.fromGridTile == null }.sumBy { it.toGridTile.tile.num }
+        val scoreIncrement = updatedGridTileMovements.filter { it.fromGridTile == null }.sumOf { it.toGridTile.tile.num }
         currentScore += scoreIncrement
         bestScore = max(bestScore, currentScore)
 
@@ -94,7 +95,7 @@ private fun createRandomAddedTile(grid: List<List<Tile?>>): GridTileMovement? {
         tiles.mapIndexed { col, it -> if (it == null) Cell(row, col) else null }.filterNotNull()
     }
     val emptyCell = emptyCells.getOrNull(emptyCells.indices.random()) ?: return null
-    return GridTileMovement.add(GridTile(emptyCell, if (Math.random() < 0.9f) Tile(2) else Tile(4)))
+    return GridTileMovement.add(GridTile(emptyCell, if (Random.nextFloat() < 0.9f) Tile(2) else Tile(4)))
 }
 
 private fun makeMove(grid: List<List<Tile?>>, direction: Direction): Pair<List<List<Tile?>>, List<GridTileMovement>> {
@@ -111,7 +112,7 @@ private fun makeMove(grid: List<List<Tile?>>, direction: Direction): Pair<List<L
 
     val gridTileMovements = mutableListOf<GridTileMovement>()
 
-    updatedGrid = updatedGrid.mapIndexed { currentRowIndex, _ ->
+    updatedGrid = List(updatedGrid.size) { currentRowIndex ->
         val tiles = updatedGrid[currentRowIndex].toMutableList()
         var lastSeenTileIndex: Int? = null
         var lastSeenEmptyIndex: Int? = null
@@ -186,7 +187,7 @@ private fun makeMove(grid: List<List<Tile?>>, direction: Direction): Pair<List<L
     }
 
     // Rotate the grid back to its original state.
-    updatedGrid = updatedGrid.rotate(floorMod(-numRotations, GRID_SIZE))
+    updatedGrid = updatedGrid.rotate((-numRotations).floorMod(Direction.entries.size))
 
     return Pair(updatedGrid, gridTileMovements)
 }
@@ -214,7 +215,7 @@ private fun <T> List<List<T>>.map(transform: (row: Int, col: Int, T) -> T): List
 
 private fun checkIsGameOver(grid: List<List<Tile?>>): Boolean {
     // The game is over if no tiles can be moved in any of the 4 directions.
-    return Direction.values().none { hasGridChanged(makeMove(grid, it).second) }
+    return Direction.entries.toList().none { hasGridChanged(makeMove(grid, it).second) }
 }
 
 private fun hasGridChanged(gridTileMovements: List<GridTileMovement>): Boolean {
@@ -223,4 +224,9 @@ private fun hasGridChanged(gridTileMovements: List<GridTileMovement>): Boolean {
         val (fromTile, toTile) = it
         fromTile == null || fromTile.cell != toTile.cell
     }
+}
+
+private fun Int.floorMod(other: Int): Int {
+    val mod = this % other
+    return if ((mod xor other) < 0 && mod != 0) mod + other else mod
 }
