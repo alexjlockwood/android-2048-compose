@@ -1,26 +1,28 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.MinFlingVelocity
-import androidx.compose.ui.gesture.TouchSlop
-import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.WithConstraints
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ChainStyle
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
 import com.alexjlockwood.twentyfortyeight.R
 import com.alexjlockwood.twentyfortyeight.domain.Direction
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
+import kotlin.math.PI
+import kotlin.math.atan2
 
 /**
  * Renders the 2048 game's home screen UI.
@@ -36,6 +38,7 @@ fun GameUi(
     onSwipeListener: (direction: Direction) -> Unit,
 ) {
     var shouldShowNewGameDialog by remember { mutableStateOf(false) }
+    var swipeAngle by remember { mutableDoubleStateOf(0.0) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -43,22 +46,42 @@ fun GameUi(
                 contentColor = Color.White,
                 backgroundColor = MaterialTheme.colors.primaryVariant,
                 actions = {
-                    IconButton(onClick = { shouldShowNewGameDialog = true }) { Icon(Icons.Filled.Add) }
+                    IconButton(onClick = { shouldShowNewGameDialog = true }) { Icon(Icons.Filled.Add, contentDescription = null) }
                 }
             )
         }
-    ) {
-        val dragObserver = with(AmbientDensity.current) {
-            SwipeDragObserver(TouchSlop.toPx(), MinFlingVelocity.toPx(), onSwipeListener)
-        }
-        WithConstraints {
+    ) { innerPadding ->
+        BoxWithConstraints {
             val isPortrait = maxWidth < maxHeight
             ConstraintLayout(
                 constraintSet = buildConstraints(isPortrait),
-                modifier = Modifier.fillMaxSize().dragGestureFilter(dragObserver),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .pointerInput(Unit) {
+                        detectDragGestures(
+                            onDrag = { change, dragAmount ->
+                                change.consume()
+                                swipeAngle = with(dragAmount) { (atan2(-y, x) * 180 / PI + 360) % 360 }
+                            },
+                            onDragEnd = {
+                                onSwipeListener(
+                                    when {
+                                        45 <= swipeAngle && swipeAngle < 135 -> Direction.NORTH
+                                        135 <= swipeAngle && swipeAngle < 225 -> Direction.WEST
+                                        225 <= swipeAngle && swipeAngle < 315 -> Direction.SOUTH
+                                        else -> Direction.EAST
+                                    }
+                                )
+                            }
+                        )
+                    },
             ) {
                 GameGrid(
-                    modifier = Modifier.aspectRatio(1f).padding(16.dp).layoutId("gameGrid"),
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .padding(16.dp)
+                        .layoutId("gameGrid"),
                     gridTileMovements = gridTileMovements,
                     moveCount = moveCount,
                 )

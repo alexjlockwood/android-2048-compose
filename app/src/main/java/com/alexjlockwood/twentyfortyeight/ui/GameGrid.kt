@@ -1,19 +1,20 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
-import androidx.compose.animation.animatedFloat
-import androidx.compose.animation.animatedValue
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -21,13 +22,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.WithConstraints
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
 import com.alexjlockwood.twentyfortyeight.viewmodel.GRID_SIZE
+import kotlinx.coroutines.launch
 import kotlin.math.min
 
 private val GRID_TILE_RADIUS = 4.dp
@@ -41,12 +42,12 @@ fun GameGrid(
     gridTileMovements: List<GridTileMovement>,
     moveCount: Int,
 ) {
-    WithConstraints(modifier) {
-        val width = with(AmbientDensity.current) { maxWidth.toPx() }
-        val height = with(AmbientDensity.current) { maxHeight.toPx() }
-        val tileMarginPx = with(AmbientDensity.current) { 4.dp.toPx() }
+    BoxWithConstraints(modifier) {
+        val width = with(LocalDensity.current) { maxWidth.toPx() }
+        val height = with(LocalDensity.current) { maxHeight.toPx() }
+        val tileMarginPx = with(LocalDensity.current) { 4.dp.toPx() }
         val tileSizePx = ((min(width, height) - tileMarginPx * (GRID_SIZE - 1)) / GRID_SIZE).coerceAtLeast(0f)
-        val tileSizeDp = Dp(tileSizePx / AmbientDensity.current.density)
+        val tileSizeDp = Dp(tileSizePx / LocalDensity.current.density)
         val tileOffsetPx = tileSizePx + tileMarginPx
         val emptyTileColor = getEmptyTileColor(isSystemInDarkTheme())
         Box(
@@ -101,8 +102,8 @@ private fun GridTileText(
     toOffset: Offset,
     moveCount: Int,
 ) {
-    val animatedScale = animatedFloat(fromScale)
-    val animatedOffset = animatedValue(fromOffset, Offset.VectorConverter)
+    val animatedScale = remember { Animatable(fromScale) }
+    val animatedOffset = remember { Animatable(fromOffset, Offset.VectorConverter) }
     Text(
         text = "$num",
         modifier = Modifier.size(size)
@@ -118,10 +119,12 @@ private fun GridTileText(
         color = Color.White,
         fontSize = 18.sp,
     )
-    onCommit(moveCount) {
-        animatedScale.snapTo(if (moveCount == 0) 1f else fromScale)
-        animatedScale.animateTo(1f, tween(durationMillis = 200, delayMillis = 50))
-        animatedOffset.animateTo(toOffset, tween(durationMillis = 100))
+    LaunchedEffect(moveCount) {
+        launch {
+            animatedScale.snapTo(if (moveCount == 0) 1f else fromScale)
+            animatedScale.animateTo(1f, tween(durationMillis = 200, delayMillis = 50))
+        }
+        launch { animatedOffset.animateTo(toOffset, tween(durationMillis = 100)) }
     }
 }
 
