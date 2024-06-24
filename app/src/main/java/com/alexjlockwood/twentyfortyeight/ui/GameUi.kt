@@ -41,7 +41,6 @@ fun GameUi(
     gridTileMovements: List<GridTileMovement>,
     currentScore: Int,
     bestScore: Int,
-    moveCount: Int,
     isGameOver: Boolean,
     onNewGameRequested: () -> Unit,
     onSwipeListener: (direction: Direction) -> Unit,
@@ -86,7 +85,7 @@ fun GameUi(
                     )
                 },
             gameGrid = { gridSize ->
-                GameGrid(gridTileMovements = gridTileMovements, moveCount = moveCount, gridSize = gridSize)
+                GameGrid(gridTileMovements = gridTileMovements, gridSize = gridSize)
             },
             currentScoreText = { TextLabel(text = "$currentScore", fontSize = 36.sp) },
             currentScoreLabel = { TextLabel(text = "Score", fontSize = 18.sp) },

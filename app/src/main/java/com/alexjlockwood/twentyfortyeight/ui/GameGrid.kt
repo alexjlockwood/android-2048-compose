@@ -1,8 +1,5 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -11,25 +8,20 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
 import com.alexjlockwood.twentyfortyeight.viewmodel.GRID_SIZE
-import kotlinx.coroutines.launch
-
-private val GRID_TILE_RADIUS = 4.dp
 
 /**
  * Renders a grid of tiles that animates when game moves are made.
@@ -37,11 +29,10 @@ private val GRID_TILE_RADIUS = 4.dp
 @Composable
 fun GameGrid(
     gridTileMovements: List<GridTileMovement>,
-    moveCount: Int,
     modifier: Modifier = Modifier,
     gridSize: Dp = 320.dp,
     tileMargin: Dp = 4.dp,
-    tileRadius: Dp = GRID_TILE_RADIUS,
+    tileRadius: Dp = 4.dp,
 ) {
     val tileSize = ((gridSize - tileMargin * (GRID_SIZE - 1)) / GRID_SIZE).coerceAtLeast(0.dp)
     val tileOffset = with(LocalDensity.current) { (tileSize + tileMargin).toPx() }
@@ -62,68 +53,46 @@ fun GameGrid(
                     }
                 }
             },
-        content = {
-            for (gridTileMovement in gridTileMovements) {
-                // Each grid tile is laid out at (0,0) in the box. Shifting tiles are then translated
-                // to their correct position in the grid, and added tiles are scaled from 0 to 1.
-                val (fromGridTile, toGridTile) = gridTileMovement
-                val fromScale = if (fromGridTile == null) 0f else 1f
-                val toOffset = Offset(toGridTile.cell.col * tileOffset, toGridTile.cell.row * tileOffset)
-                val fromOffset = fromGridTile?.let { Offset(it.cell.col * tileOffset, it.cell.row * tileOffset) } ?: toOffset
-
-                // In 2048, tiles are frequently being removed and added to the grid. As a result,
-                // the order in which grid tiles are rendered is constantly changing after each
-                // recomposition. In order to ensure that each tile animates from its correct
-                // starting position, it is critical that we assign each tile a unique ID using
-                // the key() function.
-                key(toGridTile.tile.id) {
-                    GridTileText(
-                        num = toGridTile.tile.num,
-                        size = tileSize,
-                        fromScale = fromScale,
-                        fromOffset = fromOffset,
-                        toOffset = toOffset,
-                        moveCount = moveCount,
-                    )
-                }
+    ) {
+        for (gridTileMovement in gridTileMovements) {
+            val (num, id) = gridTileMovement.toGridTile.tile
+            // In 2048, tiles are frequently being removed and added to the grid. As a result,
+            // the order in which grid tiles are rendered is constantly changing after each
+            // recomposition. In order to ensure that each tile animates from its correct
+            // starting position, it is critical that we assign each tile a unique ID using
+            // the key() function.
+            key(id) {
+                GridTileText(
+                    modifier = Modifier.animateGridTilePlacement(gridTileMovement, tileOffset),
+                    num = num,
+                    tileSize = tileSize,
+                    tileRadius = tileRadius,
+                    tileColor = getTileColor(num, isSystemInDarkTheme()),
+                )
             }
-        },
-    )
+        }
+    }
 }
 
 @Composable
 private fun GridTileText(
     num: Int,
-    size: Dp,
-    fromScale: Float,
-    fromOffset: Offset,
-    toOffset: Offset,
-    moveCount: Int,
+    modifier: Modifier = Modifier,
+    tileSize: Dp = 80.dp,
+    fontSize: TextUnit = 24.sp,
+    tileRadius: Dp = 4.dp,
+    tileColor: Color = Color.Black,
+    fontColor: Color = Color.White,
 ) {
-    val animatedScale = remember { Animatable(fromScale) }
-    val animatedOffset = remember { Animatable(fromOffset, Offset.VectorConverter) }
     Text(
         text = "$num",
-        modifier = Modifier.size(size)
-            .graphicsLayer(
-                scaleX = animatedScale.value,
-                scaleY = animatedScale.value,
-                translationX = animatedOffset.value.x,
-                translationY = animatedOffset.value.y,
-            ).background(
-                color = getTileColor(num, isSystemInDarkTheme()),
-                shape = RoundedCornerShape(GRID_TILE_RADIUS),
-            ).wrapContentSize(),
-        color = Color.White,
-        fontSize = 18.sp,
+        modifier = modifier
+            .background(tileColor, RoundedCornerShape(tileRadius))
+            .size(tileSize)
+            .wrapContentSize(),
+        color = fontColor,
+        fontSize = fontSize,
     )
-    LaunchedEffect(moveCount) {
-        launch {
-            animatedScale.snapTo(if (moveCount == 0) 1f else fromScale)
-            animatedScale.animateTo(1f, tween(durationMillis = 200, delayMillis = 50))
-        }
-        launch { animatedOffset.animateTo(toOffset, tween(durationMillis = 100)) }
-    }
 }
 
 private fun getTileColor(num: Int, isDarkTheme: Boolean): Color {

@@ -35,7 +35,7 @@ class GameViewModel(private val gameRepository: GameRepository) : ViewModel() {
         private set
     var isGameOver by mutableStateOf(false)
         private set
-    var moveCount by mutableIntStateOf(0)
+    var moveCount by mutableIntStateOf(0) // TODO: unused.
         private set
 
     init {

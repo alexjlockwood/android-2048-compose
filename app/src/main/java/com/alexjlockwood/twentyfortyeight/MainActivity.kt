@@ -32,7 +32,6 @@ class MainActivity : ComponentActivity() {
                         gridTileMovements = gameViewModel.gridTileMovements,
                         currentScore = gameViewModel.currentScore,
                         bestScore = gameViewModel.bestScore,
-                        moveCount = gameViewModel.moveCount,
                         isGameOver = gameViewModel.isGameOver,
                         onNewGameRequested = { gameViewModel.startNewGame() },
                         onSwipeListener = { direction -> gameViewModel.move(direction) },
