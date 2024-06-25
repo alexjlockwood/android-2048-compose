@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -23,24 +24,25 @@ fun GameLayout(
     bestScoreText: @Composable (() -> Unit),
     bestScoreLabel: @Composable (() -> Unit),
     modifier: Modifier = Modifier,
+    padding: Dp = 16.dp,
 ) {
-    BoxWithConstraints(modifier = Modifier) {
+    BoxWithConstraints(modifier = modifier) {
         val isPortrait = maxWidth < maxHeight
-        val gridSize = min(maxWidth, maxHeight) - 32.dp
+        val gridSize = min(maxWidth, maxHeight) - padding * 2
         if (isPortrait) {
             Column(
-                modifier = modifier,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(padding),
             ) {
                 Box(
                     modifier = Modifier
-                        .padding(start = 16.dp, top = 16.dp, end = 16.dp)
+                        .padding(start = padding, top = padding, end = padding)
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center,
                 ) { gameGrid(gridSize) }
                 Row(
                     modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp)
+                        .padding(start = padding, end = padding)
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
@@ -56,18 +58,18 @@ fun GameLayout(
             }
         } else {
             Row(
-                modifier = modifier,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(padding)
             ) {
                 Box(
                     modifier = Modifier
-                        .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                        .padding(start = padding, top = padding, bottom = padding)
                         .fillMaxHeight(),
                     contentAlignment = Alignment.Center,
                 ) { gameGrid(gridSize) }
                 Column(
                     modifier = Modifier
-                        .padding(top = 16.dp, bottom = 16.dp)
+                        .padding(top = padding, bottom = padding)
                         .align(Alignment.Bottom)
                 ) {
                     currentScoreText()
