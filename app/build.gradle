@@ -28,7 +28,6 @@ kotlin {
             dependencies {
                 implementation libs.androidx.core.ktx
                 implementation libs.androidx.activity.compose
-                implementation libs.kotlinx.coroutines.android
                 implementation libs.squareup.okio
                 implementation libs.xxfast.kstore.file
             }
@@ -76,8 +75,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+        }
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.getByName("debug")
         }
     }
 
