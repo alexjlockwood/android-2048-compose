@@ -1,0 +1,32 @@
+[versions]
+androidGradlePlugin = "8.5.1"
+androidxActivity = "1.9.1"
+androidxCore = "1.13.1"
+harawataAppdirs = "1.2.2"
+jetbrainsCompose = "1.6.11"
+jetbrainsLifecycle = "2.8.0"
+kotlin = "2.0.10"
+kotlinxCoroutines = "1.8.1"
+kotlinxSerialization = "1.7.1"
+squareupOkio = "3.9.0"
+xxfastKstore = "0.8.0"
+
+[libraries]
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
+androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrainsLifecycle" }
+harawata-appdirs = { module = "net.harawata:appdirs", version.ref = "harawataAppdirs" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+squareup-okio = { module = "com.squareup.okio:okio", version.ref = "squareupOkio" }
+xxfast-kstore-common = { module = "io.github.xxfast:kstore", version.ref = "xxfastKstore" }
+xxfast-kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "xxfastKstore" }
+xxfast-kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "xxfastKstore" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrainsCompose" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
