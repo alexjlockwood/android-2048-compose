@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -37,8 +38,8 @@ fun GameLayout(
     val bestScoreText = remember(bestScoreText) { movableContentOf(bestScoreText) }
     val bestScoreLabel = remember(bestScoreLabel) { movableContentOf(bestScoreLabel) }
     BoxWithConstraints(modifier = modifier) {
-        val isPortrait = maxWidth < maxHeight
-        val gridSize = min(maxWidth, maxHeight) - padding * 2
+        val isPortrait = maxWidth < 720.dp
+        val gridSize = min(maxWidth, maxHeight).coerceAtMost(600.dp) - padding * 2
 
         if (isPortrait) {
             Column(
@@ -57,7 +58,8 @@ fun GameLayout(
                 Row(
                     modifier = Modifier
                         .padding(start = padding, end = padding)
-                        .fillMaxWidth(),
+                        .width(gridSize)
+                        .align(Alignment.CenterHorizontally),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Column {
@@ -89,7 +91,9 @@ fun GameLayout(
                 Column(
                     modifier = Modifier
                         .padding(top = padding, bottom = padding)
-                        .align(Alignment.Bottom),
+                        .height(gridSize)
+                        .align(Alignment.CenterVertically),
+                    verticalArrangement = Arrangement.Bottom,
                 ) {
                     currentScoreText()
                     currentScoreLabel()
