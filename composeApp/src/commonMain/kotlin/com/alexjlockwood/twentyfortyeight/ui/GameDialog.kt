@@ -13,6 +13,7 @@ fun GameDialog(
     onConfirmListener: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // TODO: update this to match iOS style dialog on iOS
     AlertDialog(
         modifier = modifier,
         title = { Text(text = title) },
