@@ -4,14 +4,13 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldDefaults
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,7 +46,7 @@ fun GameUi(
     currentScore: Int,
     bestScore: Int,
     isGameOver: Boolean,
-    onNewGameRequested: () -> Unit,
+    onNewGameRequest: () -> Unit,
     onSwipeListener: (direction: Direction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -83,7 +82,7 @@ fun GameUi(
             GameTopAppBar(
                 title = { Text("2048") },
                 contentColor = Color.White,
-                backgroundColor = MaterialTheme.colors.primaryVariant,
+                backgroundColor = MaterialTheme.colorScheme.secondary,
                 actions = {
                     IconButton(onClick = { shouldShowNewGameDialog = true }) {
                         Icon(Icons.Filled.Add, contentDescription = null)
@@ -91,30 +90,35 @@ fun GameUi(
                 },
             )
         },
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
     ) { innerPadding ->
         GameLayout(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectDragGestures(
-                        onDrag = { change, dragAmount ->
-                            change.consume()
-                            swipeAngle = with(dragAmount) { (atan2(-y, x) * 180 / PI + 360) % 360 }
-                        },
-                        onDragEnd = {
-                            onSwipeListener(
-                                when {
-                                    45 <= swipeAngle && swipeAngle < 135 -> Direction.NORTH
-                                    135 <= swipeAngle && swipeAngle < 225 -> Direction.WEST
-                                    225 <= swipeAngle && swipeAngle < 315 -> Direction.SOUTH
-                                    else -> Direction.EAST
+                .then(
+                    if (shouldDetectSwipes()) {
+                        Modifier.pointerInput(Unit) {
+                            detectDragGestures(
+                                onDrag = { change, dragAmount ->
+                                    change.consume()
+                                    swipeAngle = with(dragAmount) { (atan2(-y, x) * 180 / PI + 360) % 360 }
+                                },
+                                onDragEnd = {
+                                    onSwipeListener(
+                                        when {
+                                            45 <= swipeAngle && swipeAngle < 135 -> Direction.NORTH
+                                            135 <= swipeAngle && swipeAngle < 225 -> Direction.WEST
+                                            225 <= swipeAngle && swipeAngle < 315 -> Direction.SOUTH
+                                            else -> Direction.EAST
+                                        },
+                                    )
                                 },
                             )
-                        },
-                    )
-                },
+                        }
+                    } else {
+                        Modifier
+                    },
+                ),
             gameGrid = { gridSize -> GameGrid(gridTileMovements = gridTileMovements, gridSize = gridSize) },
             currentScoreText = { TextLabel(text = "$currentScore", fontSize = 36.sp) },
             currentScoreLabel = { TextLabel(text = "SCORE", fontSize = 18.sp) },
@@ -131,15 +135,15 @@ fun GameUi(
         GameDialog(
             title = "Game over",
             message = "Start a new game?",
-            onConfirmListener = { onNewGameRequested() },
+            onConfirmListener = { onNewGameRequest() },
             onDismissListener = null,
         )
     } else if (shouldShowNewGameDialog) {
         GameDialog(
             title = "Start a new game?",
-            message = "Starting a new game will erase your current game",
+            message = "Starting a new game will erase your current game.",
             onConfirmListener = {
-                onNewGameRequested()
+                onNewGameRequest()
                 shouldShowNewGameDialog = false
             },
             onDismissListener = { shouldShowNewGameDialog = false },
@@ -169,3 +173,5 @@ private val KeyEvent.direction: Direction?
         Key.DirectionRight -> Direction.EAST
         else -> null
     }
+
+internal expect fun shouldDetectSwipes(): Boolean

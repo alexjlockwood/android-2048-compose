@@ -1,10 +1,11 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 actual fun GameTopAppBar(
     title: @Composable () -> Unit,
@@ -13,10 +14,12 @@ actual fun GameTopAppBar(
     actions: @Composable () -> Unit,
 ) {
     TopAppBar(
-        windowInsets = AppBarDefaults.topAppBarWindowInsets,
         title = title,
-        contentColor = contentColor,
-        backgroundColor = backgroundColor,
+//        colors = TopAppBarDefaults.topAppBarColors(
+//            containerColor = backgroundColor,
+//            titleContentColor = contentColor,
+//            actionIconContentColor = contentColor,
+//        ),
         actions = { actions() },
     )
 }

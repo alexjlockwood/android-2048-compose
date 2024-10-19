@@ -1,6 +1,6 @@
 package com.alexjlockwood.twentyfortyeight
 
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.alexjlockwood.twentyfortyeight.repository.GameRepository
@@ -18,7 +18,7 @@ fun App(repository: GameRepository) {
                 currentScore = gameViewModel.currentScore,
                 bestScore = gameViewModel.bestScore,
                 isGameOver = gameViewModel.isGameOver,
-                onNewGameRequested = { gameViewModel.startNewGame() },
+                onNewGameRequest = { gameViewModel.startNewGame() },
                 onSwipeListener = { direction -> gameViewModel.move(direction) },
             )
         }

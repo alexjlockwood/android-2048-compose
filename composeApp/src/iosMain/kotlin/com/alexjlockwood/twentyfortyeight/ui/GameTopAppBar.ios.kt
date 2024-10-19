@@ -1,23 +1,12 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Surface
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 actual fun GameTopAppBar(
     title: @Composable () -> Unit,
@@ -25,32 +14,40 @@ actual fun GameTopAppBar(
     backgroundColor: Color,
     actions: @Composable () -> Unit,
 ) {
-    // Custom app bar to ensure the title is center aligned on iOS.
-    Surface(
-        color = backgroundColor,
-        contentColor = contentColor,
-        elevation = AppBarDefaults.TopAppBarElevation,
-    ) {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(AppBarDefaults.topAppBarWindowInsets)
-                .padding(AppBarDefaults.ContentPadding)
-                .height(56.dp),
-        ) {
-            Box(Modifier.align(Alignment.Center)) {
-                ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-                        title()
-                    }
-                }
-            }
+    CenterAlignedTopAppBar(
+        title = { Text("2048") },
+//        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+//            titleContentColor = contentColor,
+//            actionIconContentColor = contentColor,
+//        ),
+        actions = { actions() },
+    )
 
-            Box(Modifier.align(Alignment.CenterEnd)) {
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    actions()
-                }
-            }
-        }
-    }
+    // Custom app bar to ensure the title is center aligned on iOS.
+//    Surface(
+//        color = backgroundColor,
+//        contentColor = contentColor,
+//    ) {
+//        Box(
+//            Modifier
+//                .fillMaxWidth()
+//                .windowInsetsPadding(AppBarDefaults.topAppBarWindowInsets)
+//                .padding(AppBarDefaults.ContentPadding)
+//                .height(56.dp),
+//        ) {
+//            Box(Modifier.align(Alignment.Center)) {
+//                ProvideTextStyle(value = MaterialTheme.typography.h6) {
+//                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+//                        title()
+//                    }
+//                }
+//            }
+//
+//            Box(Modifier.align(Alignment.CenterEnd)) {
+//                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+//                    actions()
+//                }
+//            }
+//        }
+//    }
 }
