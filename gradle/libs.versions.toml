@@ -5,7 +5,7 @@ android-minSdk = "24"
 android-targetSdk = "34"
 androidx-activityCompose = "1.9.3"
 androidx-core-ktx = "1.13.1"
-androidx-lifecycle = "2.8.2"
+androidx-lifecycle = "2.8.3"
 compose-plugin = "1.7.0"
 kotlin = "2.0.20"
 kotlinx-coroutines = "1.9.0"
@@ -14,6 +14,7 @@ squareupOkio = "3.9.0"
 xxfastKstore = "0.8.0"
 harawataAppdirs = "1.2.2"
 jetbrainsLifecycle = "2.8.2"
+calfVersion = "0.5.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -29,6 +30,7 @@ squareup-okio = { module = "com.squareup.okio:okio", version.ref = "squareupOkio
 xxfast-kstore-common = { module = "io.github.xxfast:kstore", version.ref = "xxfastKstore" }
 xxfast-kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "xxfastKstore" }
 xxfast-kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "xxfastKstore" }
+calf-ui = { module = "com.mohamedrejeb.calf:calf-ui", version.ref = "calfVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

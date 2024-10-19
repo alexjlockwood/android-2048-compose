@@ -21,7 +21,7 @@ fun main() = application {
 
     Window(
         onCloseRequest = ::exitApplication,
-        title = "2048 Compose",
+        title = "2048",
     ) {
         App(
             repository = GameRepository(store),

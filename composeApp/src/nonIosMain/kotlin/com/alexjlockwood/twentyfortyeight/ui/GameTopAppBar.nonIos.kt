@@ -1,5 +1,7 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
+import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
@@ -10,10 +12,11 @@ actual fun GameTopAppBar(
     backgroundColor: Color,
     actions: @Composable () -> Unit,
 ) {
-    StartAlignedTopAppBar(
+    TopAppBar(
+        windowInsets = AppBarDefaults.topAppBarWindowInsets,
         title = title,
         contentColor = contentColor,
         backgroundColor = backgroundColor,
-        actions = actions,
+        actions = { actions() },
     )
 }

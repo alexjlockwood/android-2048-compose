@@ -71,6 +71,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.xxfast.kstore.common)
+            implementation(libs.calf.ui)
         }
 
         androidMain.dependencies {
@@ -98,6 +99,17 @@ kotlin {
 
         wasmJsMain.dependencies {
             implementation(libs.xxfast.kstore.storage)
+        }
+    }
+
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    applyDefaultHierarchyTemplate {
+        common {
+            group("nonIos") {
+                withAndroidTarget()
+                withJvm()
+                withWasmJs()
+            }
         }
     }
 }
