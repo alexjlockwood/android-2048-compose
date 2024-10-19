@@ -13,9 +13,9 @@ import com.alexjlockwood.twentyfortyeight.domain.GridTile
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
 import com.alexjlockwood.twentyfortyeight.domain.Tile
 import com.alexjlockwood.twentyfortyeight.repository.GameRepository
-import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.random.Random
+import kotlinx.coroutines.launch
 
 const val GRID_SIZE = 4
 private const val NUM_INITIAL_TILES = 2

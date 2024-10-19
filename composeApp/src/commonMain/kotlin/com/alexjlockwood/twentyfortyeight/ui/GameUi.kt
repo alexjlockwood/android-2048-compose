@@ -2,22 +2,16 @@ package com.alexjlockwood.twentyfortyeight.ui
 
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldDefaults
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
@@ -42,7 +35,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.alexjlockwood.twentyfortyeight.domain.Direction
 import com.alexjlockwood.twentyfortyeight.domain.GridTileMovement
-import kotlinx.coroutines.delay
 import kotlin.math.PI
 import kotlin.math.atan2
 
@@ -96,7 +88,7 @@ fun GameUi(
                     IconButton(onClick = { shouldShowNewGameDialog = true }) {
                         Icon(Icons.Filled.Add, contentDescription = null)
                     }
-                }
+                },
             )
         },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
@@ -118,9 +110,9 @@ fun GameUi(
                                     135 <= swipeAngle && swipeAngle < 225 -> Direction.WEST
                                     225 <= swipeAngle && swipeAngle < 315 -> Direction.SOUTH
                                     else -> Direction.EAST
-                                }
+                                },
                             )
-                        }
+                        },
                     )
                 },
             gameGrid = { gridSize -> GameGrid(gridTileMovements = gridTileMovements, gridSize = gridSize) },
@@ -150,7 +142,7 @@ fun GameUi(
                 onNewGameRequested()
                 shouldShowNewGameDialog = false
             },
-            onDismissListener = { shouldShowNewGameDialog = false }
+            onDismissListener = { shouldShowNewGameDialog = false },
         )
     }
 }
@@ -170,7 +162,7 @@ private fun TextLabel(
 }
 
 private val KeyEvent.direction: Direction?
-    get() = when(key) {
+    get() = when (key) {
         Key.DirectionUp -> Direction.NORTH
         Key.DirectionLeft -> Direction.WEST
         Key.DirectionDown -> Direction.SOUTH

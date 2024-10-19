@@ -36,7 +36,8 @@ private data class AnimateGridTilePlacementElement(
 private class AnimateGridTilePlacementNode(
     gridTileMovement: GridTileMovement,
     offset: Float,
-) : LayoutModifierNode, Modifier.Node() {
+) : Modifier.Node(),
+    LayoutModifierNode {
 
     // Each grid tile is laid out at (0,0) in the box. Shifting tiles are then translated
     // to their correct position in the grid, and added tiles are scaled from 0 to 1.
@@ -69,7 +70,7 @@ private class AnimateGridTilePlacementNode(
         return layout(placeable.width, placeable.height) {
             placeable.placeWithLayer(
                 x = 0,
-                y = 0
+                y = 0,
             ) {
                 scaleX = animatedScale.value
                 scaleY = animatedScale.value

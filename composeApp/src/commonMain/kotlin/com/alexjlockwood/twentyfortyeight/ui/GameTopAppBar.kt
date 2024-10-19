@@ -1,15 +1,9 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ContentAlpha
@@ -26,50 +20,62 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun GameTopAppBar(
+expect fun GameTopAppBar(
+    title: @Composable () -> Unit,
+    contentColor: Color,
+    backgroundColor: Color,
+    actions: @Composable () -> Unit,
+)
+
+@Composable
+internal fun StartAlignedTopAppBar(
     title: @Composable () -> Unit,
     contentColor: Color,
     backgroundColor: Color,
     actions: @Composable () -> Unit,
 ) {
-    if (TopAppBarTitleHorizontalAlignment == Alignment.CenterHorizontally) {
-        // Custom app bar to ensure the title is center aligned on iOS.
-        Surface(
-            color = backgroundColor,
-            contentColor = contentColor,
-            elevation = AppBarDefaults.TopAppBarElevation,
-        ) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(AppBarDefaults.topAppBarWindowInsets)
-                    .padding(AppBarDefaults.ContentPadding)
-                    .height(56.dp),
-            ) {
-                Box(Modifier.align(Alignment.Center)) {
-                    ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-                            title()
-                        }
-                    }
-                }
+    TopAppBar(
+        windowInsets = AppBarDefaults.topAppBarWindowInsets,
+        title = title,
+        contentColor = contentColor,
+        backgroundColor = backgroundColor,
+        actions = { actions() },
+    )
+}
 
-                Box(Modifier.align(Alignment.CenterEnd)) {
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                        actions()
+@Composable
+internal fun CenterAlignedTopAppBar(
+    title: @Composable () -> Unit,
+    contentColor: Color,
+    backgroundColor: Color,
+    actions: @Composable () -> Unit,
+) {
+    // Custom app bar to ensure the title is center aligned on iOS.
+    Surface(
+        color = backgroundColor,
+        contentColor = contentColor,
+        elevation = AppBarDefaults.TopAppBarElevation,
+    ) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(AppBarDefaults.topAppBarWindowInsets)
+                .padding(AppBarDefaults.ContentPadding)
+                .height(56.dp),
+        ) {
+            Box(Modifier.align(Alignment.Center)) {
+                ProvideTextStyle(value = MaterialTheme.typography.h6) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                        title()
                     }
                 }
             }
+
+            Box(Modifier.align(Alignment.CenterEnd)) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    actions()
+                }
+            }
         }
-    } else {
-        TopAppBar(
-            windowInsets = AppBarDefaults.topAppBarWindowInsets,
-            title = title,
-            contentColor = contentColor,
-            backgroundColor = backgroundColor,
-            actions = { actions() },
-        )
     }
 }
-
-internal expect val TopAppBarTitleHorizontalAlignment: Alignment.Horizontal
