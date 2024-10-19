@@ -88,9 +88,8 @@ fun GameUi(
             .focusRequester(focusRequester)
             .focusable(),
         topBar = {
-            TopAppBar(
-                windowInsets = AppBarDefaults.topAppBarWindowInsets,
-                title = { Text(text = "2048") },
+            GameTopAppBar(
+                title = { Text("2048") },
                 contentColor = Color.White,
                 backgroundColor = MaterialTheme.colors.primaryVariant,
                 actions = {
