@@ -140,6 +140,7 @@ fun GameUi(
             title = "Game over",
             message = "Start a new game?",
             onConfirmListener = { onNewGameRequested() },
+            onDismissListener = null,
         )
     } else if (shouldShowNewGameDialog) {
         GameDialog(
@@ -149,6 +150,7 @@ fun GameUi(
                 onNewGameRequested()
                 shouldShowNewGameDialog = false
             },
+            onDismissListener = { shouldShowNewGameDialog = false }
         )
     }
 }

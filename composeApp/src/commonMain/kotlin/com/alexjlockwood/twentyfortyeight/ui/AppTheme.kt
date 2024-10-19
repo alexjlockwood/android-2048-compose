@@ -7,8 +7,14 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val DarkColorPalette = darkColors(primaryVariant = Color(0xff3f51b5))
-private val LightColorPalette = lightColors(primaryVariant = Color(0xff1da9da))
+private val DarkColorPalette = darkColors(
+    primary = Color(0xff4e6cef),
+    primaryVariant = Color(0xff3f51b5),
+)
+private val LightColorPalette = lightColors(
+    primary = Color(0xff50c0e9),
+    primaryVariant = Color(0xff1da9da),
+)
 
 @Composable
 fun AppTheme(content: @Composable () -> Unit) {

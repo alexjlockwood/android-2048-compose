@@ -11,6 +11,7 @@ fun GameDialog(
     title: String,
     message: String,
     onConfirmListener: () -> Unit,
+    onDismissListener: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     // TODO: update this to match iOS style dialog on iOS
@@ -19,6 +20,7 @@ fun GameDialog(
         title = { Text(text = title) },
         text = { Text(text = message) },
         confirmButton = { TextButton(onClick = { onConfirmListener() }) { Text("OK") } },
-        onDismissRequest = {},
+        dismissButton = onDismissListener?.let { { TextButton(onClick = it) { Text("Cancel") } } },
+        onDismissRequest = { onDismissListener?.invoke() },
     )
 }
