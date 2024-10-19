@@ -11,7 +11,6 @@ fun GameDialog(
     title: String,
     message: String,
     onConfirmListener: () -> Unit,
-    onDismissListener: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AlertDialog(
@@ -19,7 +18,6 @@ fun GameDialog(
         title = { Text(text = title) },
         text = { Text(text = message) },
         confirmButton = { TextButton(onClick = { onConfirmListener() }) { Text("OK") } },
-        dismissButton = { TextButton(onClick = { onDismissListener() }) { Text("Cancel") } },
-        onDismissRequest = { onDismissListener() },
+        onDismissRequest = {},
     )
 }
