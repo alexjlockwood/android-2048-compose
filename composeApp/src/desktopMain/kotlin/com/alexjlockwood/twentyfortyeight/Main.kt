@@ -1,6 +1,7 @@
+package com.alexjlockwood.twentyfortyeight
+
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import com.alexjlockwood.twentyfortyeight.App
 import com.alexjlockwood.twentyfortyeight.domain.UserData
 import com.alexjlockwood.twentyfortyeight.repository.GameRepository
 import com.alexjlockwood.twentyfortyeight.repository.USER_DATA_FILE_NAME

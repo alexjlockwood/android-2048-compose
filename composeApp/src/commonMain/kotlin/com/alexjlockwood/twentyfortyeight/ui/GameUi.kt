@@ -1,26 +1,37 @@
 package com.alexjlockwood.twentyfortyeight.ui
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
@@ -49,6 +60,7 @@ fun GameUi(
         modifier = modifier,
         topBar = {
             TopAppBar(
+                windowInsets = AppBarDefaults.topAppBarWindowInsets,
                 title = { Text(text = "2048 Compose") },
                 contentColor = Color.White,
                 backgroundColor = MaterialTheme.colors.primaryVariant,
@@ -57,12 +69,29 @@ fun GameUi(
                 }
             )
         },
-        contentWindowInsets = WindowInsets.safeDrawing,
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
     ) { innerPadding ->
+        val requester = remember { FocusRequester() }
         GameLayout(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .onKeyEvent {
+                    val direction = when(it.key) {
+                        Key.DirectionUp -> Direction.NORTH
+                        Key.DirectionLeft -> Direction.WEST
+                        Key.DirectionDown -> Direction.SOUTH
+                        Key.DirectionRight -> Direction.EAST
+                        else -> null
+                    }
+
+                    if (direction != null) {
+                        onSwipeListener(direction)
+                        true
+                    } else {
+                        false
+                    }
+                }
                 .pointerInput(Unit) {
                     detectDragGestures(
                         onDrag = { change, dragAmount ->
@@ -80,7 +109,9 @@ fun GameUi(
                             )
                         }
                     )
-                },
+                }
+                .focusRequester(requester)
+                .focusable(),
             gameGrid = { gridSize ->
                 GameGrid(gridTileMovements = gridTileMovements, gridSize = gridSize)
             },
@@ -89,7 +120,12 @@ fun GameUi(
             bestScoreText = { TextLabel(text = "$bestScore", fontSize = 36.sp) },
             bestScoreLabel = { TextLabel(text = "Best", fontSize = 18.sp) },
         )
+
+        LaunchedEffect(Unit) {
+            requester.requestFocus()
+        }
     }
+
     if (isGameOver) {
         GameDialog(
             title = "Game over",

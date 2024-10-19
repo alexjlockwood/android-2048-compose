@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,14 +61,19 @@ fun GameLayout(
         } else {
             Row(
                 modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(padding)
+                horizontalArrangement = Arrangement.Center,
             ) {
                 Box(
                     modifier = Modifier
                         .padding(start = padding, top = padding, bottom = padding)
                         .fillMaxHeight(),
                     contentAlignment = Alignment.Center,
-                ) { gameGrid(gridSize) }
+                ) {
+                    gameGrid(gridSize)
+                }
+
+                Spacer(Modifier.width(padding))
+
                 Column(
                     modifier = Modifier
                         .padding(top = padding, bottom = padding)
