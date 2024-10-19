@@ -29,7 +29,7 @@ jobs:
 
       - name: Build WasmJs with Gradle
         run: |
-          ./gradlew :composeApp:./gradlew :composeApp:wasmJsBrowserDistribution --no-configuration-cache
+          ./gradlew :composeApp:wasmJsBrowserDistribution --no-configuration-cache
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
