@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   workflow_call:
   push:
+    branches:
+      - master  
     paths-ignore:
       - '**.md'
   pull_request:
