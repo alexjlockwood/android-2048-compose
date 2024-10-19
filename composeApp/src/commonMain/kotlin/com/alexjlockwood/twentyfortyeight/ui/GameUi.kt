@@ -125,9 +125,9 @@ fun GameUi(
                 },
             gameGrid = { gridSize -> GameGrid(gridTileMovements = gridTileMovements, gridSize = gridSize) },
             currentScoreText = { TextLabel(text = "$currentScore", fontSize = 36.sp) },
-            currentScoreLabel = { TextLabel(text = "Score", fontSize = 18.sp) },
+            currentScoreLabel = { TextLabel(text = "SCORE", fontSize = 18.sp) },
             bestScoreText = { TextLabel(text = "$bestScore", fontSize = 36.sp) },
-            bestScoreLabel = { TextLabel(text = "Best", fontSize = 18.sp) },
+            bestScoreLabel = { TextLabel(text = "BEST", fontSize = 18.sp) },
         )
     }
 
