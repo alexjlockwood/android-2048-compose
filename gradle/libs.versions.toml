@@ -1,5 +1,5 @@
 [versions]
-agp = "8.2.2"
+agp = "8.7.1"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
@@ -13,8 +13,6 @@ kotlinxSerialization = "1.7.1"
 squareupOkio = "3.9.0"
 xxfastKstore = "0.8.0"
 harawataAppdirs = "1.2.2"
-jetbrainsLifecycle = "2.8.2"
-calfVersion = "0.5.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -23,14 +21,13 @@ androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", nam
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
-androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrainsLifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 harawata-appdirs = { module = "net.harawata:appdirs", version.ref = "harawataAppdirs" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 squareup-okio = { module = "com.squareup.okio:okio", version.ref = "squareupOkio" }
 xxfast-kstore-common = { module = "io.github.xxfast:kstore", version.ref = "xxfastKstore" }
 xxfast-kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "xxfastKstore" }
 xxfast-kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "xxfastKstore" }
-calf-ui = { module = "com.mohamedrejeb.calf:calf-ui", version.ref = "calfVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
