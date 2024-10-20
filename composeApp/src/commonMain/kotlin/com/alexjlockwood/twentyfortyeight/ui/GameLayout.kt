@@ -38,7 +38,7 @@ fun GameLayout(
     val bestScoreText = remember(bestScoreText) { movableContentOf(bestScoreText) }
     val bestScoreLabel = remember(bestScoreLabel) { movableContentOf(bestScoreLabel) }
     BoxWithConstraints(modifier = modifier) {
-        val isPortrait = maxWidth < 720.dp
+        val isPortrait = maxWidth < maxHeight
         val gridSize = min(maxWidth, maxHeight).coerceAtMost(600.dp) - padding * 2
 
         if (isPortrait) {
@@ -97,6 +97,7 @@ fun GameLayout(
                 ) {
                     currentScoreText()
                     currentScoreLabel()
+                    Spacer(Modifier.height(16.dp))
                     bestScoreText()
                     bestScoreLabel()
                 }
