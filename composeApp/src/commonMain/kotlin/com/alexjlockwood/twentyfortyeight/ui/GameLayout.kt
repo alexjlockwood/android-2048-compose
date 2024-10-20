@@ -30,25 +30,26 @@ fun GameLayout(
     bestScoreText: @Composable (() -> Unit),
     bestScoreLabel: @Composable (() -> Unit),
     modifier: Modifier = Modifier,
-    padding: Dp = 16.dp,
 ) {
     val gameGrid = remember(gameGrid) { movableContentOf(gameGrid) }
     val currentScoreText = remember(currentScoreText) { movableContentOf(currentScoreText) }
     val currentScoreLabel = remember(currentScoreLabel) { movableContentOf(currentScoreLabel) }
     val bestScoreText = remember(bestScoreText) { movableContentOf(bestScoreText) }
     val bestScoreLabel = remember(bestScoreLabel) { movableContentOf(bestScoreLabel) }
+
     BoxWithConstraints(modifier = modifier) {
         val isPortrait = maxWidth < maxHeight
-        val gridSize = min(maxWidth, maxHeight).coerceAtMost(600.dp) - padding * 2
+        val gridSize = min(maxWidth, maxHeight).coerceAtMost(GameGridMaxWidth) - GameGridPadding * 2
 
         if (isPortrait) {
             Column(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(padding),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Box(
                     modifier = Modifier
-                        .padding(start = padding, top = padding, end = padding)
+                        .padding(vertical = 16.dp)
+                        .padding(start = 16.dp)
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -57,7 +58,7 @@ fun GameLayout(
 
                 Row(
                     modifier = Modifier
-                        .padding(start = padding, end = padding)
+                        .padding(horizontal = 16.dp)
                         .width(gridSize)
                         .align(Alignment.CenterHorizontally),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -66,6 +67,7 @@ fun GameLayout(
                         currentScoreText()
                         currentScoreLabel()
                     }
+
                     Column(horizontalAlignment = Alignment.End) {
                         bestScoreText()
                         bestScoreLabel()
@@ -74,23 +76,25 @@ fun GameLayout(
             }
         } else {
             Row(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize(),
                 horizontalArrangement = Arrangement.Center,
             ) {
                 Box(
                     modifier = Modifier
-                        .padding(start = padding, top = padding, bottom = padding)
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .padding(vertical = 16.dp)
+                        .padding(start = 16.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     gameGrid(gridSize)
                 }
 
-                Spacer(Modifier.width(padding))
+                Spacer(Modifier.width(16.dp))
 
                 Column(
                     modifier = Modifier
-                        .padding(top = padding, bottom = padding)
+                        .padding(vertical = 16.dp)
                         .height(gridSize)
                         .align(Alignment.CenterVertically),
                     verticalArrangement = Arrangement.Bottom,
@@ -105,3 +109,6 @@ fun GameLayout(
         }
     }
 }
+
+private val GameGridMaxWidth = 600.dp
+private val GameGridPadding = 16.dp

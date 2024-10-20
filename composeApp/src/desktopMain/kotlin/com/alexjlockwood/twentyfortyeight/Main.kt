@@ -10,7 +10,7 @@ import net.harawata.appdirs.AppDirsFactory
 import okio.FileSystem
 import okio.Path.Companion.toPath
 
-private const val PACKAGE_NAME = "com.alexjlockwood.twentyfortyeightcompose"
+private const val PACKAGE_NAME = "com.alexjlockwood.twentyfortyeight"
 private const val VERSION = "1.0.0"
 private const val AUTHOR = "alexjlockwood"
 
@@ -23,8 +23,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "2048",
     ) {
-        App(
-            repository = GameRepository(store),
-        )
+        App(repository = GameRepository(store))
     }
 }

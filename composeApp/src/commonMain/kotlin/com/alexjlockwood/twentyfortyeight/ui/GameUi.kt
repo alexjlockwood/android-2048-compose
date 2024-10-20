@@ -174,4 +174,7 @@ private val KeyEvent.direction: Direction?
         else -> null
     }
 
+/**
+ * Returns true if the platform should support moves via touch gestures.
+ */
 internal expect fun shouldDetectSwipes(): Boolean

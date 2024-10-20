@@ -68,10 +68,7 @@ private class AnimateGridTilePlacementNode(
     override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
         val placeable = measurable.measure(constraints)
         return layout(placeable.width, placeable.height) {
-            placeable.placeWithLayer(
-                x = 0,
-                y = 0,
-            ) {
+            placeable.placeWithLayer(x = 0, y = 0) {
                 scaleX = animatedScale.value
                 scaleY = animatedScale.value
                 translationX = animatedOffset.value.x
