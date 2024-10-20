@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -40,6 +41,7 @@ import kotlin.math.atan2
 /**
  * Renders the 2048 game's home screen UI.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameUi(
     gridTileMovements: List<GridTileMovement>,
@@ -79,16 +81,23 @@ fun GameUi(
             .focusRequester(focusRequester)
             .focusable(),
         topBar = {
-            GameTopAppBar(
-                title = { Text("2048") },
-                contentColor = Color.White,
-                backgroundColor = MaterialTheme.colorScheme.secondary,
-                actions = {
-                    IconButton(onClick = { shouldShowNewGameDialog = true }) {
-                        Icon(Icons.Filled.Add, contentDescription = null)
-                    }
-                },
-            )
+            val title = @Composable { Text("2048") }
+            val actions = @Composable {
+                IconButton(onClick = { shouldShowNewGameDialog = true }) {
+                    Icon(Icons.Filled.Add, contentDescription = null)
+                }
+            }
+            if (shouldCenterAlignTopAppBar()) {
+                CenterAlignedTopAppBar(
+                    title = title,
+                    actions = { actions() },
+                )
+            } else {
+                TopAppBar(
+                    title = title,
+                    actions = { actions() },
+                )
+            }
         },
     ) { innerPadding ->
         GameLayout(
@@ -166,11 +175,11 @@ private fun TextLabel(
 }
 
 private val KeyEvent.direction: Direction?
-    get() = when {
-        key == Key.DirectionUp || key == Key.W -> Direction.NORTH
-        key == Key.DirectionLeft || key == Key.A -> Direction.WEST
-        key == Key.DirectionDown || key == Key.S -> Direction.SOUTH
-        key == Key.DirectionRight || key == Key.D -> Direction.EAST
+    get() = when (key) {
+        Key.DirectionUp, Key.W -> Direction.NORTH
+        Key.DirectionLeft, Key.A -> Direction.WEST
+        Key.DirectionDown, Key.S -> Direction.SOUTH
+        Key.DirectionRight, Key.D -> Direction.EAST
         else -> null
     }
 
@@ -178,3 +187,8 @@ private val KeyEvent.direction: Direction?
  * Returns true if the platform should support moves via touch gestures.
  */
 internal expect fun shouldDetectSwipes(): Boolean
+
+/**
+ * Returns true if the top app bar should be center aligned.
+ */
+internal expect fun shouldCenterAlignTopAppBar(): Boolean
