@@ -166,11 +166,11 @@ private fun TextLabel(
 }
 
 private val KeyEvent.direction: Direction?
-    get() = when (key) {
-        Key.DirectionUp -> Direction.NORTH
-        Key.DirectionLeft -> Direction.WEST
-        Key.DirectionDown -> Direction.SOUTH
-        Key.DirectionRight -> Direction.EAST
+    get() = when {
+        key == Key.DirectionUp || key == Key.W -> Direction.NORTH
+        key == Key.DirectionLeft || key == Key.A -> Direction.WEST
+        key == Key.DirectionDown || key == Key.S -> Direction.SOUTH
+        key == Key.DirectionRight || key == Key.D -> Direction.EAST
         else -> null
     }
 
