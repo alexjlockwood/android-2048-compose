@@ -7,7 +7,7 @@ A simple 2048 app written with 100% Jetpack Compose Multiplatform. It is availab
 - Desktop
 - Web (available [here](https://alexjlockwood.github.io/compose-multiplatform-2048/))
 
-![Screen capture of app](art/twenty-forty-eight.webm)
+![Screen capture of app](art/twenty-forty-eight.gif)
 
 Use `./gradlew :composeApp:run` to run the Desktop app.
 
