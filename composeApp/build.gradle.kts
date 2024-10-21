@@ -94,17 +94,6 @@ kotlin {
             implementation(libs.xxfast.kstore.storage)
         }
     }
-
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    applyDefaultHierarchyTemplate {
-        common {
-            group("nonIos") {
-                withAndroidTarget()
-                withJvm()
-                withWasmJs()
-            }
-        }
-    }
 }
 
 android {
